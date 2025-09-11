@@ -12,8 +12,14 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['Figtree', ...defaultTheme.fontFamily.sans],
+                sans: ['"Clash Display"', ...defaultTheme.fontFamily.sans],
             },
+            colors: {
+                'primary': '#0f0f0f',
+                'accent-blue': '#0052ff',
+                'accent-pink': '#ff00c1',
+                'light-gray': '#f8f8f8',
+            }
         },
     },
 
