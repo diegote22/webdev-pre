@@ -13,9 +13,15 @@ return new class extends Migration
     {
         Schema::create('lessons', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->foreignId('course_id')->constrained('courses')->onDelete('cascade');
-            $table->decimal('price', 8, 2)->nullable(); // Precio si se vende por separado
+            $table->foreignId('section_id')->constrained()->cascadeOnDelete();
+            $table->string('title');
+            $table->text('description')->nullable();
+            $table->enum('video_type', ['youtube', 'local'])->nullable();
+            $table->string('video_url')->nullable();
+            $table->string('thumbnail_path')->nullable();
+            $table->boolean('is_published')->default(false);
+            $table->boolean('is_preview')->default(false);
+            $table->unsignedInteger('position')->default(0);
             $table->timestamps();
         });
     }

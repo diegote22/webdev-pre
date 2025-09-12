@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->foreignId('role_id')->default(3)->constrained('roles'); // 3 sería 'Estudiante' por defecto
+            $table->foreignId('role_id')->nullable()->constrained('roles')->nullOnDelete();
         });
     }
 

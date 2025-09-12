@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\User;
 use App\Models\Role;
@@ -14,16 +15,37 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        // Crear usuario administrador si no existe
         $adminRole = Role::where('name', 'Administrador')->first();
+        $profRole = Role::where('name', 'Profesor')->first();
+        $studRole = Role::where('name', 'Estudiante')->first();
 
-        User::firstOrCreate(
-            ['email' => 'admin@example.com'],
+        $admin = User::firstOrCreate(
+            ['email' => 'admin@demo.test'],
             [
-                'name' => 'Admin Principal',
+                'name' => 'Admin Demo',
                 'password' => Hash::make('password'),
-                'role_id' => $adminRole?->id ?? 1,
+                'role_id' => $adminRole?->id,
             ]
         );
+
+        $prof = User::firstOrCreate(
+            ['email' => 'profesor@demo.test'],
+            [
+                'name' => 'Profesor Demo',
+                'password' => Hash::make('password'),
+                'role_id' => $profRole?->id,
+            ]
+        );
+
+        foreach ([1, 2, 3] as $i) {
+            User::firstOrCreate(
+                ['email' => "estudiante{$i}@demo.test"],
+                [
+                    'name' => "Estudiante {$i}",
+                    'password' => Hash::make('password'),
+                    'role_id' => $studRole?->id,
+                ]
+            );
+        }
     }
 }

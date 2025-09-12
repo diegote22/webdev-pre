@@ -6,13 +6,25 @@ use Illuminate\Database\Eloquent\Model;
 
 class Lesson extends Model
 {
-    public function course()
+    protected $fillable = [
+        'section_id',
+        'title',
+        'description',
+        'video_type',
+        'video_url',
+        'thumbnail_path',
+        'is_published',
+        'is_preview',
+        'position'
+    ];
+
+    public function section()
     {
-        return $this->belongsTo(Course::class);
+        return $this->belongsTo(Section::class);
     }
 
-    public function topics()
+    public function attachments()
     {
-        return $this->hasMany(Topic::class);
+        return $this->hasMany(LessonAttachment::class);
     }
 }

@@ -13,12 +13,6 @@ return new class extends Migration
     {
         Schema::create('topics', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->text('content')->nullable();
-            $table->string('video_url')->nullable();
-            $table->boolean('is_free')->default(false);
-            $table->decimal('price', 8, 2)->nullable(); // Precio si se vende por separado
-            $table->foreignId('lesson_id')->constrained('lessons')->onDelete('cascade');
             $table->timestamps();
         });
     }
