@@ -2,8 +2,8 @@
     <div class="space-y-6">
         <form method="POST" action="{{ route('courses.sections.store', $course) }}" class="flex gap-2">
             @csrf
-            <input name="name" class="flex-1 border rounded p-2" placeholder="Nombre de la nueva sección" required>
-            <button class="px-3 py-2 bg-gray-100 rounded" type="submit">Agregar sección</button>
+            <input name="name" class="flex-1 input input-bordered" placeholder="Nombre de la nueva sección" required>
+            <button class="btn" type="submit">Agregar sección</button>
         </form>
 
         @forelse($course->sections()->with(['lessons.attachments'])->orderBy('position')->get() as $section)
@@ -13,14 +13,13 @@
                         class="flex-1 flex gap-2">
                         @csrf
                         @method('PUT')
-                        <input name="name" value="{{ $section->name }}" class="flex-1 border rounded p-2">
-                        <button class="px-3 py-2 bg-gray-100 rounded" type="submit">Guardar sección</button>
+                        <input name="name" value="{{ $section->name }}" class="flex-1 input input-bordered">
+                        <button class="btn" type="submit">Guardar sección</button>
                     </form>
                     <form method="POST" action="{{ route('courses.sections.destroy', [$course, $section]) }}">
                         @csrf
                         @method('DELETE')
-                        <button class="px-3 py-2 bg-red-100 text-red-700 rounded" type="submit">Eliminar
-                            sección</button>
+                        <button class="btn btn-error" type="submit">Eliminar sección</button>
                     </form>
                 </div>
 
@@ -34,41 +33,40 @@
                                 @method('PUT')
                                 <!-- Título y switches -->
                                 <div class="flex items-center gap-3">
-                                    <input name="title" value="{{ $lesson->title }}" class="flex-1 border rounded p-2"
+                                    <input name="title" value="{{ $lesson->title }}" class="flex-1 input input-bordered"
                                         placeholder="Título de la lección">
-                                    <label class="inline-flex items-center gap-2 text-sm"><input type="checkbox"
+                                    <label class="inline-flex items-center gap-2 text-sm"><input type="checkbox" class="toggle"
                                             name="is_preview" value="1" @checked($lesson->is_preview)>
                                         Gratuita</label>
-                                    <label class="inline-flex items-center gap-2 text-sm"><input type="checkbox"
+                                    <label class="inline-flex items-center gap-2 text-sm"><input type="checkbox" class="toggle"
                                             name="is_published" value="1" @checked($lesson->is_published)>
                                         Publicada</label>
-                                    <button class="px-3 py-2 bg-gray-100 rounded" type="submit">Guardar
-                                        lección</button>
+                                    <button class="btn" type="submit">Guardar lección</button>
                                 </div>
 
                                 <!-- Subtítulo: Video -->
                                 <div class="text-sm font-medium text-black">Agregar video</div>
                                 <div class="grid grid-cols-1 md:grid-cols-3 gap-3 items-start">
                                     <div class="flex gap-2 md:col-span-2 flex-wrap">
-                                        <select name="video_type" class="border rounded p-2" x-model="type">
+                                        <select name="video_type" class="select select-bordered" x-model="type">
                                             <option value="">Sin video</option>
                                             <option value="youtube" @selected($lesson->video_type === 'youtube')>YouTube</option>
                                             <option value="local" @selected($lesson->video_type === 'local')>Archivo local</option>
                                         </select>
                                         <input name="youtube_url" x-model.lazy="youtubeUrl"
                                             value="{{ $lesson->video_type === 'youtube' ? $lesson->video_url : '' }}"
-                                            placeholder="URL YouTube" class="flex-1 border rounded p-2"
+                                            placeholder="URL YouTube" class="flex-1 input input-bordered"
                                             x-show="type==='youtube'">
                                         <div class="flex items-center gap-2 w-full md:w-auto" x-show="type==='local'">
                                             <label class="text-sm text-black whitespace-nowrap">Archivo de video</label>
                                             <input type="file" name="video_file" accept="video/*"
-                                                class="border rounded p-2" @change="onLocalVideo($event)">
+                                                class="file-input file-input-bordered" @change="onLocalVideo($event)">
                                         </div>
                                         <div class="flex items-center gap-2 w-full md:w-auto">
                                             <label class="text-sm text-black whitespace-nowrap">Miniatura
                                                 (opcional)</label>
                                             <input type="file" name="thumbnail" accept="image/*"
-                                                class="border rounded p-2" title="Miniatura">
+                                                class="file-input file-input-bordered" title="Miniatura">
                                         </div>
                                     </div>
                                     <div>
@@ -100,8 +98,8 @@
                                         enctype="multipart/form-data" class="flex items-center gap-2">
                                         @csrf
                                         <input type="file" name="attachments[]" accept="application/pdf,image/*"
-                                            multiple class="border rounded p-2">
-                                        <button class="px-3 py-2 bg-gray-100 rounded" type="submit">Subir</button>
+                                            multiple class="file-input file-input-bordered">
+                                        <button class="btn" type="submit">Subir</button>
                                     </form>
                                     <ul class="text-sm list-disc pl-5 space-y-2">
                                         @forelse(($lesson->attachments ?? collect()) as $att)
@@ -141,8 +139,7 @@
                                 class="mt-2">
                                 @csrf
                                 @method('DELETE')
-                                <button class="px-3 py-2 bg-red-100 text-red-700 rounded" type="submit">Eliminar
-                                    lección</button>
+                                <button class="btn btn-error" type="submit">Eliminar lección</button>
                             </form>
                         </div>
                     @empty
@@ -156,25 +153,25 @@
                             x-data="addLessonForm()">
                             @csrf
                             <input name="title" placeholder="Título de la lección"
-                                class="sm:col-span-2 border rounded p-2" required>
-                            <select name="video_type" class="border rounded p-2" x-model="type">
+                                class="sm:col-span-2 input input-bordered" required>
+                            <select name="video_type" class="select select-bordered" x-model="type">
                                 <option value="">Sin video</option>
                                 <option value="youtube">YouTube</option>
                                 <option value="local">Archivo local</option>
                             </select>
-                            <input name="youtube_url" placeholder="URL YouTube" class="border rounded p-2"
+                            <input name="youtube_url" placeholder="URL YouTube" class="input input-bordered"
                                 x-show="type==='youtube'">
                             <div class="flex items-center gap-2" x-show="type==='local'">
                                 <label class="text-sm text-black whitespace-nowrap">Archivo de video</label>
-                                <input type="file" name="video_file" accept="video/*" class="border rounded p-2"
+                                <input type="file" name="video_file" accept="video/*" class="file-input file-input-bordered"
                                     @change="onLocalVideo($event)">
                             </div>
                             <div class="sm:col-span-6 flex items-center gap-4 mt-1">
-                                <label class="inline-flex items-center gap-1 text-sm"><input type="checkbox"
-                                        name="is_preview" value="1"> Gratuita</label>
-                                <label class="inline-flex items-center gap-1 text-sm"><input type="checkbox"
-                                        name="is_published" value="1"> Publicada</label>
-                                <button class="ml-auto px-3 py-2 bg-gray-100 rounded" type="submit">Agregar</button>
+                <label class="inline-flex items-center gap-1 text-sm"><input type="checkbox" class="toggle"
+                    name="is_preview" value="1"> Gratuita</label>
+                <label class="inline-flex items-center gap-1 text-sm"><input type="checkbox" class="toggle"
+                    name="is_published" value="1"> Publicada</label>
+                <button class="ml-auto btn" type="submit">Agregar</button>
                             </div>
                             <div class="sm:col-span-6" x-show="type==='local'">
                                 <div class="text-sm text-black mb-1">Previsualización</div>

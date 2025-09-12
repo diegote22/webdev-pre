@@ -1,7 +1,7 @@
 @if(isset($course))
 <div x-data="goalsManager()" x-init="init()" class="space-y-4">
     <div class="flex justify-end">
-        <button @click="openCreate()" class="px-3 py-2 bg-indigo-600 text-white rounded shadow hover:bg-indigo-700">Nueva meta</button>
+        <button @click="openCreate()" class="btn btn-primary">Nueva meta</button>
     </div>
     <ul class="divide-y rounded border bg-white" @dragover.prevent @drop="onDrop">
         @foreach($course->goals()->orderBy('position')->get() as $goal)
@@ -13,8 +13,8 @@
                 <span class="text-gray-400">≡</span>
                 <span class="flex-1">{{ $goal->text }}</span>
                 <div class="flex gap-2">
-                    <button class="px-2 py-1 text-sm text-amber-700 bg-amber-100 rounded hover:bg-amber-200" @click="openEdit({ id: {{ $goal->id }}, text: @js($goal->text) })">Editar</button>
-                    <button class="px-2 py-1 text-sm text-red-700 bg-red-100 rounded hover:bg-red-200" @click="openDelete({ id: {{ $goal->id }}, text: @js($goal->text) })">Eliminar</button>
+                    <button class="btn btn-xs" @click="openEdit({ id: {{ $goal->id }}, text: @js($goal->text) })">Editar</button>
+                    <button class="btn btn-xs btn-error" @click="openDelete({ id: {{ $goal->id }}, text: @js($goal->text) })">Eliminar</button>
                 </div>
             </li>
         @endforeach
@@ -31,35 +31,37 @@
         </form>
     </div>
 
-    <!-- Modal base -->
-    <div x-show="modal.open" x-cloak class="fixed inset-0 z-40 flex items-center justify-center">
-        <div class="absolute inset-0 bg-black/30" @click="closeModal()"></div>
-        <div class="relative z-50 w-full max-w-lg bg-white rounded-lg shadow-lg p-6">
-            <h3 class="text-lg font-semibold mb-4" x-text="modal.title"></h3>
+    <!-- Modal daisyUI -->
+    <dialog x-ref="goalModal" :open="modal.open" class="modal">
+        <div class="modal-box">
+            <h3 class="font-bold text-lg" x-text="modal.title"></h3>
             <template x-if="modal.type==='create' || modal.type==='edit'">
-                <form :action="modal.action" method="POST" class="space-y-4">
+                <form :action="modal.action" method="POST" class="space-y-4 mt-3">
                     @csrf
                     <template x-if="modal.type==='edit'"><input type="hidden" name="_method" value="PUT"></template>
-                    <input name="text" class="w-full border rounded p-2" :value="modal.payload.text || ''" placeholder="Descripción de la meta" required>
-                    <div class="flex justify-end gap-2">
-                        <button type="button" @click="closeModal()" class="px-3 py-2 bg-gray-100 rounded">Cancelar</button>
-                        <button class="px-3 py-2 bg-indigo-600 text-white rounded">Guardar</button>
+                    <input name="text" class="input input-bordered w-full" :value="modal.payload.text || ''" placeholder="Descripción de la meta" required>
+                    <div class="modal-action">
+                        <button type="button" @click="closeModal()" class="btn">Cancelar</button>
+                        <button class="btn btn-primary">Guardar</button>
                     </div>
                 </form>
             </template>
             <template x-if="modal.type==='delete'">
-                <form :action="modal.action" method="POST" class="space-y-4">
+                <form :action="modal.action" method="POST" class="space-y-4 mt-3">
                     @csrf
                     <input type="hidden" name="_method" value="DELETE">
                     <p>¿Eliminar la meta: <span class="font-medium" x-text="modal.payload.text"></span>?</p>
-                    <div class="flex justify-end gap-2">
-                        <button type="button" @click="closeModal()" class="px-3 py-2 bg-gray-100 rounded">Cancelar</button>
-                        <button class="px-3 py-2 bg-red-600 text-white rounded">Eliminar</button>
+                    <div class="modal-action">
+                        <button type="button" @click="closeModal()" class="btn">Cancelar</button>
+                        <button class="btn btn-error">Eliminar</button>
                     </div>
                 </form>
             </template>
+            <form method="dialog" class="modal-backdrop">
+                <button @click="closeModal()">close</button>
+            </form>
         </div>
-    </div>
+    </dialog>
 </div>
 
 <script>
@@ -93,33 +95,18 @@ function goalsManager() {
             this.$refs?.reorderForm?.scrollIntoView({behavior:'smooth', block:'nearest'});
         },
         openCreate() {
-            this.modal = {
-                open: true,
-                type: 'create',
-                title: 'Nueva meta',
-                action: @js(route('courses.goals.store', $course)),
-                payload: {}
-            };
+            this.modal = { open: true, type: 'create', title: 'Nueva meta', action: @js(route('courses.goals.store', $course)), payload: {} };
+            this.$nextTick(()=> this.$refs.goalModal?.showModal());
         },
         openEdit(goal) {
-            this.modal = {
-                open: true,
-                type: 'edit',
-                title: 'Editar meta',
-                action: @js(route('courses.goals.update', [$course, 0])) .replace('/0', '/' + goal.id),
-                payload: goal
-            };
+            this.modal = { open: true, type: 'edit', title: 'Editar meta', action: @js(route('courses.goals.update', [$course, 0])) .replace('/0', '/' + goal.id), payload: goal };
+            this.$nextTick(()=> this.$refs.goalModal?.showModal());
         },
         openDelete(goal) {
-            this.modal = {
-                open: true,
-                type: 'delete',
-                title: 'Eliminar meta',
-                action: @js(route('courses.goals.destroy', [$course, 0])) .replace('/0', '/' + goal.id),
-                payload: goal
-            };
+            this.modal = { open: true, type: 'delete', title: 'Eliminar meta', action: @js(route('courses.goals.destroy', [$course, 0])) .replace('/0', '/' + goal.id), payload: goal };
+            this.$nextTick(()=> this.$refs.goalModal?.showModal());
         },
-        closeModal() { this.modal.open = false; }
+        closeModal() { this.modal.open = false; this.$refs.goalModal?.close(); }
     }
 }
 </script>

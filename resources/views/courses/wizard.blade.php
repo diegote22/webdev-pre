@@ -7,42 +7,41 @@
 
     <div class="py-6" x-data="{ step: '{{ request('tab', session('activeTab', 'general')) }}' }">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <!-- Tabs superiores (móvil/tablet) -->
+            <div class="md:hidden mb-4">
+                <div class="tabs tabs-boxed w-full">
+                    <button @click="step='general'" :class="step==='general' ? 'tab tab-active' : 'tab'">General</button>
+                    <button @click="step='customize'" :class="step==='customize' ? 'tab tab-active' : 'tab'">Personalizar</button>
+                    <button @click="step='promo'" :class="step==='promo' ? 'tab tab-active' : 'tab'">Promo</button>
+                    <button @click="step='goals'" :class="step==='goals' ? 'tab tab-active' : 'tab'">Metas</button>
+                    <button @click="step='requirements'" :class="step==='requirements' ? 'tab tab-active' : 'tab'">Requisitos</button>
+                    <button @click="step='sections'" :class="step==='sections' ? 'tab tab-active' : 'tab'">Secciones</button>
+                </div>
+            </div>
+
             <div class="grid grid-cols-12 gap-6">
                 <!-- Aside de pestañas verticales -->
-                <aside class="col-span-12 lg:col-span-3">
-                    <nav class="bg-white shadow-sm rounded-lg p-2 sticky top-4">
-                        <ul class="space-y-1">
+                <aside class="col-span-12 lg:col-span-3 hidden md:block">
+                    <nav class="sticky top-4">
+                        <ul class="menu bg-base-100 rounded-box shadow-sm">
                             <li>
-                                <button @click="step='general'"
-                                    :class="step === 'general' ? 'bg-indigo-50 text-indigo-700' : 'text-black hover:bg-gray-50'"
-                                    class="w-full text-left px-3 py-2 rounded">Datos generales</button>
+                                <button @click="step='general'" :class="step==='general' ? 'active' : ''">Datos generales</button>
                             </li>
                             <li>
-                                <button @click="step='customize'"
-                                    :class="step === 'customize' ? 'bg-indigo-50 text-indigo-700' :
-                                        'text-black hover:bg-gray-50'"
-                                    class="w-full text-left px-3 py-2 rounded">Personalizar curso</button>
+                                <button @click="step='customize'" :class="step==='customize' ? 'active' : ''">Personalizar curso</button>
                             </li>
                             <li>
-                                <button @click="step='promo'"
-                                    :class="step === 'promo' ? 'bg-indigo-50 text-indigo-700' : 'text-black hover:bg-gray-50'"
-                                    class="w-full text-left px-3 py-2 rounded">Video promocional</button>
+                                <button @click="step='promo'" :class="step==='promo' ? 'active' : ''">Video promocional</button>
+                            </li>
+                            <li class="menu-title"><span>Contenido</span></li>
+                            <li>
+                                <button @click="step='goals'" :class="step==='goals' ? 'active' : ''">Metas del curso</button>
                             </li>
                             <li>
-                                <button @click="step='goals'"
-                                    :class="step === 'goals' ? 'bg-indigo-50 text-indigo-700' : 'text-black hover:bg-gray-50'"
-                                    class="w-full text-left px-3 py-2 rounded">Metas del curso</button>
+                                <button @click="step='requirements'" :class="step==='requirements' ? 'active' : ''">Requisitos del curso</button>
                             </li>
                             <li>
-                                <button @click="step='requirements'"
-                                    :class="step === 'requirements' ? 'bg-indigo-50 text-indigo-700' :
-                                        'text-black hover:bg-gray-50'"
-                                    class="w-full text-left px-3 py-2 rounded">Requisitos del curso</button>
-                            </li>
-                            <li>
-                                <button @click="step='sections'"
-                                    :class="step === 'sections' ? 'bg-indigo-50 text-indigo-700' : 'text-black hover:bg-gray-50'"
-                                    class="w-full text-left px-3 py-2 rounded">Secciones del curso</button>
+                                <button @click="step='sections'" :class="step==='sections' ? 'active' : ''">Secciones del curso</button>
                             </li>
                         </ul>
                     </nav>
