@@ -27,7 +27,7 @@
             @csrf
             @method('PUT')
             <input type="hidden" name="order" :value="JSON.stringify(order)">
-            <button type="submit" class="px-3 py-2 bg-gray-100 rounded hover:bg-gray-200">Guardar orden</button>
+            <button type="submit" class="btn">Guardar orden</button>
         </form>
     </div>
 

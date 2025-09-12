@@ -23,27 +23,15 @@
                 <!-- Aside de pestañas verticales -->
                 <aside class="col-span-12 lg:col-span-3 hidden md:block">
                     <nav class="sticky top-4">
-                        <ul class="menu bg-base-100 rounded-box shadow-sm">
-                            <li>
-                                <button @click="step='general'" :class="step==='general' ? 'active' : ''">Datos generales</button>
-                            </li>
-                            <li>
-                                <button @click="step='customize'" :class="step==='customize' ? 'active' : ''">Personalizar curso</button>
-                            </li>
-                            <li>
-                                <button @click="step='promo'" :class="step==='promo' ? 'active' : ''">Video promocional</button>
-                            </li>
-                            <li class="menu-title"><span>Contenido</span></li>
-                            <li>
-                                <button @click="step='goals'" :class="step==='goals' ? 'active' : ''">Metas del curso</button>
-                            </li>
-                            <li>
-                                <button @click="step='requirements'" :class="step==='requirements' ? 'active' : ''">Requisitos del curso</button>
-                            </li>
-                            <li>
-                                <button @click="step='sections'" :class="step==='sections' ? 'active' : ''">Secciones del curso</button>
-                            </li>
-                        </ul>
+                        <div class="tabs tabs-lifted tabs-vertical w-full">
+                            <button @click="step='general'" :class="step==='general' ? 'tab tab-active' : 'tab'">Datos generales</button>
+                            <button @click="step='customize'" :class="step==='customize' ? 'tab tab-active' : 'tab'">Personalizar curso</button>
+                            <button @click="step='promo'" :class="step==='promo' ? 'tab tab-active' : 'tab'">Video promocional</button>
+                            <div class="mt-2 px-3 text-xs text-gray-500">Contenido</div>
+                            <button @click="step='goals'" :class="step==='goals' ? 'tab tab-active' : 'tab'">Metas del curso</button>
+                            <button @click="step='requirements'" :class="step==='requirements' ? 'tab tab-active' : 'tab'">Requisitos del curso</button>
+                            <button @click="step='sections'" :class="step==='sections' ? 'tab tab-active' : 'tab'">Secciones del curso</button>
+                        </div>
                     </nav>
                 </aside>
 
