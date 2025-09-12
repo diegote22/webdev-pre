@@ -146,10 +146,12 @@
                         <p class="text-sm text-gray-500">No hay lecciones en esta sección.</p>
                     @endforelse
 
-                    <details class="mt-2">
-                        <summary class="cursor-pointer text-sm text-black">Agregar lección</summary>
+                    <div class="collapse collapse-arrow bg-base-100 border mt-2">
+                        <input type="checkbox" />
+                        <div class="collapse-title text-sm font-medium">Agregar lección</div>
+                        <div class="collapse-content">
                         <form method="POST" action="{{ route('courses.lessons.store', [$course, $section]) }}"
-                            class="mt-2 grid grid-cols-1 sm:grid-cols-6 gap-2" enctype="multipart/form-data"
+                            class="grid grid-cols-1 sm:grid-cols-6 gap-2" enctype="multipart/form-data"
                             x-data="addLessonForm()">
                             @csrf
                             <input name="title" placeholder="Título de la lección"
@@ -179,7 +181,8 @@
                                     x-show="localUrl" controls></video>
                             </div>
                         </form>
-                    </details>
+                        </div>
+                    </div>
                 </div>
             </div>
         @empty

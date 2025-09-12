@@ -14,6 +14,15 @@
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script>
+        (function(){
+            try {
+                const stored = localStorage.getItem('theme');
+                const def = stored ? stored : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+                document.documentElement.setAttribute('data-theme', def);
+            } catch (e) {}
+        })();
+    </script>
 </head>
 
 <body class="font-sans antialiased">
@@ -33,6 +42,16 @@
         <main class="container mx-auto px-4">
             {{ $slot }}
         </main>
+        <!-- Toasts globales -->
+        @php($toastType = session('error') ? 'error' : (session('success') ? 'success' : (session('info') ? 'info' : (session('status') ? 'success' : null))))
+        @if($toastType)
+            <div x-data="{ show: true }" x-init="setTimeout(()=>show=false, 4500)" x-show="show" x-transition
+                 class="toast toast-end z-50">
+                <div class="alert alert-{{ $toastType }}">
+                    <span>{{ session('error') ?? session('success') ?? session('info') ?? session('status') }}</span>
+                </div>
+            </div>
+        @endif
     </div>
 </body>
 

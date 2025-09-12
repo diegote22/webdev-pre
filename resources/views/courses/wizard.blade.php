@@ -40,7 +40,7 @@
                     <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                         <div class="p-6 text-gray-900">
                             @if (session('status'))
-                                <div class="mb-4 px-4 py-2 rounded bg-green-50 text-green-700 border border-green-200">
+                                <div class="alert alert-success mb-4">
                                     {{ session('status') }}
                                 </div>
                             @endif
