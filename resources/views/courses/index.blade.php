@@ -7,9 +7,13 @@
 
     <div class="py-6">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                @if(session('status'))
+                    <div class="alert alert-success mb-4">
+                        {{ session('status') }}
+                    </div>
+                @endif
             <div class="flex justify-end mb-4">
-                <a href="{{ route('courses.create') }}"
-                    class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">Nuevo curso</a>
+                    <a href="{{ route('courses.create') }}" class="btn btn-primary">Nuevo curso</a>
             </div>
             @if (session('status'))
                 <div class="mb-4 p-3 bg-green-100 text-green-700 rounded">{{ session('status') }}</div>
