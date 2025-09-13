@@ -28,7 +28,7 @@
                 <!-- Theme Toggle -->
                 <div x-data="{dark: (document.documentElement.getAttribute('data-theme')==='dark')}" class="flex items-center">
                     <label class="swap swap-rotate">
-                        <input type="checkbox" :checked="dark" @change="dark = !dark; const t = dark ? 'dark' : 'light'; document.documentElement.setAttribute('data-theme', t); try{localStorage.setItem('theme', t)}catch(e){}" />
+                        <input type="checkbox" :checked="dark" @change="dark = !dark; const t = dark ? 'dark' : 'light'; const root = document.documentElement; root.setAttribute('data-theme', t); if(t==='dark') root.classList.add('dark'); else root.classList.remove('dark'); try{localStorage.setItem('theme', t)}catch(e){}; window.dispatchEvent(new CustomEvent('theme-changed', { detail: t }));" />
                         <!-- sun -->
                         <svg class="swap-off fill-current w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                             <path d="M5.64 17l-1.41 1.41L5.64 20.83 7.05 19.41 5.64 17zM1 13h3v-2H1v2zm10-9h2V1h-2v3zm7.36 3.64l1.41-1.41L19.41 2.17 18 3.59l1.36 1.36zM17 18.36l1.36 1.36 1.41-1.41L18.41 17l-1.41 1.36zM20 11v2h3v-2h-3zM12 5a7 7 0 100 14 7 7 0 000-14z"/>
@@ -104,7 +104,7 @@
                     <input type="checkbox" class="toggle"
                            x-data="{dark:(document.documentElement.getAttribute('data-theme')==='dark')}"
                            :checked="dark"
-                           @change="dark=!dark; const t = dark ? 'dark':'light'; document.documentElement.setAttribute('data-theme', t); try{localStorage.setItem('theme', t)}catch(e){}" />
+                           @change="dark=!dark; const t = dark ? 'dark':'light'; const root = document.documentElement; root.setAttribute('data-theme', t); if(t==='dark') root.classList.add('dark'); else root.classList.remove('dark'); try{localStorage.setItem('theme', t)}catch(e){}; window.dispatchEvent(new CustomEvent('theme-changed', { detail: t }));" />
                 </label>
             </div>
         </div>

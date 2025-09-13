@@ -19,7 +19,10 @@
             try {
                 const stored = localStorage.getItem('theme');
                 const def = stored ? stored : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-                document.documentElement.setAttribute('data-theme', def);
+                const root = document.documentElement;
+                root.setAttribute('data-theme', def);
+                // Activar variantes dark: de Tailwind (por clase)
+                if(def === 'dark') root.classList.add('dark'); else root.classList.remove('dark');
             } catch (e) {}
         })();
     </script>
@@ -52,6 +55,16 @@
                 </div>
             </div>
         @endif
+
+        <!-- Toast para cambios de tema (cliente) -->
+        <div x-data="{ show:false, msg:'', type:'info', notify(theme){ this.msg = theme==='dark' ? 'Tema: oscuro' : 'Tema: claro'; this.type='info'; this.show = true; setTimeout(()=> this.show=false, 2000) } }"
+             x-on:theme-changed.window="notify($event.detail)"
+             x-show="show" x-transition
+             class="toast toast-end z-50">
+            <div class="alert alert-info">
+                <span x-text="msg"></span>
+            </div>
+        </div>
     </div>
 </body>
 
