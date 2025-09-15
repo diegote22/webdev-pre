@@ -23,6 +23,17 @@ class User extends Authenticatable
         'email',
         'password',
         'role_id',
+        'title',
+        'biography',
+        'language',
+        'website',
+        'facebook',
+        'instagram',
+        'linkedin',
+        'tiktok',
+        'twitter',
+        'youtube',
+        'avatar_path',
     ];
 
     /**

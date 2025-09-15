@@ -1,137 +1,215 @@
-<nav x-data="{ open: false }" class="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
-    <!-- Primary Navigation Menu -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16">
-            <div class="flex">
-                <!-- Logo -->
-                <div class="shrink-0 flex items-center">
-                    <a href="{{ route('dashboard') }}">
-                        <x-application-logo class="block h-9 w-auto fill-current text-gray-800 dark:text-gray-200" />
-                    </a>
-                </div>
+<div class="navbar bg-base-100 shadow-sm">
+    <!-- Logo/Brand -->
+    <div class="flex-1">
+        <a href="{{ route('dashboard') }}" class="btn btn-ghost text-xl font-bold text-primary">
+            <svg class="w-8 h-8 mr-2" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2L2 7v10c0 5.55 3.84 9.74 9 11 5.16-1.26 9-5.45 9-11V7l-10-5z" />
+                <path d="M8 11h8v2H8v-2zm0 4h8v2H8v-2z" fill="white" />
+            </svg>
+            WebDev-Pre
+        </a>
+    </div>
 
-                <!-- Navigation Links -->
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                        {{ __('Dashboard') }}
-                    </x-nav-link>
-                    @if (Auth::user() && Auth::user()->role && Auth::user()->role->name === 'Profesor')
-                        <x-nav-link :href="route('courses.index')" :active="request()->routeIs('courses.*')">
-                            {{ __('Mis Cursos') }}
-                        </x-nav-link>
-                    @endif
+    <!-- Navigation Menu (Desktop) -->
+    <div class="navbar-center hidden lg:flex items-center gap-4">
+        <ul class="menu menu-horizontal px-1 gap-2">
+            <li>
+                <a href="{{ route('dashboard') }}"
+                    class="btn btn-ghost {{ request()->routeIs('dashboard') ? 'bg-primary/10 text-primary' : '' }}">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M8 15v-1a2 2 0 114 0v1" />
+                    </svg>
+                    Mi Panel
+                </a>
+            </li>
+
+            @auth
+                @if (Auth::user()->role && Auth::user()->role->name === 'Profesor')
+                    <li>
+                        <a href="{{ route('courses.index') }}"
+                            class="btn btn-ghost {{ request()->routeIs('courses.index') ? 'bg-primary/10 text-primary' : '' }}">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                            </svg>
+                            Mis Cursos
+                        </a>
+                    </li>
+                @else
+                    <li>
+                        <a href="{{ route('student.my-courses') }}"
+                            class="btn btn-ghost {{ request()->routeIs('student.my-courses') ? 'bg-primary/10 text-primary' : '' }}">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                            </svg>
+                            Mis Cursos
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('student.messages') }}"
+                            class="btn btn-ghost {{ request()->routeIs('student.messages') ? 'bg-primary/10 text-primary' : '' }}">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                            </svg>
+                            Mensajes
+                        </a>
+                    </li>
+                @endif
+            @endauth
+        </ul>
+        <!-- Search bar (Desktop) -->
+        <form action="{{ route('courses.search') }}" method="GET" class="w-96">
+            <div class="join w-full">
+                <input type="search" name="q" value="{{ request('q') }}"
+                    class="input input-bordered join-item w-full outline-none focus:outline-none focus:ring-0 focus:border-primary"
+                    placeholder="Que curso estas buscando..." />
+                <button type="submit" class="btn btn-primary join-item">Buscar</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Right Side - Profile -->
+    <div class="flex-none gap-2">
+        @auth
+            <!-- Notifications -->
+            <div class="dropdown dropdown-end">
+                <div tabindex="0" role="button" class="btn btn-ghost btn-circle">
+                    <div class="indicator">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15 17h5l-5 5-5-5h5V3h5v14z" />
+                        </svg>
+                        @if (!empty($unreadMessagesCount))
+                            <span class="badge badge-xs badge-primary indicator-item">{{ $unreadMessagesCount }}</span>
+                        @endif
+                    </div>
+                </div>
+                <div tabindex="0" class="mt-3 z-[60] card card-compact dropdown-content w-52 bg-base-100 shadow">
+                    <div class="card-body">
+                        <span class="font-bold text-lg">{{ $unreadMessagesCount ?? 0 }} Notificaciones</span>
+                        <span
+                            class="text-info">{{ ($unreadMessagesCount ?? 0) > 0 ? 'Nuevos mensajes disponibles' : 'Sin notificaciones nuevas' }}</span>
+                        <div class="card-actions">
+                            <a href="{{ route('student.messages') }}" class="btn btn-primary btn-block"
+                                title="Ver todas las notificaciones">Ver todas</a>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Settings Dropdown -->
-            <div class="hidden sm:flex sm:items-center sm:ms-6 gap-4">
-                <!-- Theme Toggle -->
-                <div x-data="{dark: (document.documentElement.getAttribute('data-theme')==='dark')}" class="flex items-center">
-                    <label class="swap swap-rotate">
-                        <input type="checkbox" :checked="dark" @change="dark = !dark; const t = dark ? 'dark' : 'light'; const root = document.documentElement; root.setAttribute('data-theme', t); if(t==='dark') root.classList.add('dark'); else root.classList.remove('dark'); try{localStorage.setItem('theme', t)}catch(e){}; window.dispatchEvent(new CustomEvent('theme-changed', { detail: t }));" />
-                        <!-- sun -->
-                        <svg class="swap-off fill-current w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                            <path d="M5.64 17l-1.41 1.41L5.64 20.83 7.05 19.41 5.64 17zM1 13h3v-2H1v2zm10-9h2V1h-2v3zm7.36 3.64l1.41-1.41L19.41 2.17 18 3.59l1.36 1.36zM17 18.36l1.36 1.36 1.41-1.41L18.41 17l-1.41 1.36zM20 11v2h3v-2h-3zM12 5a7 7 0 100 14 7 7 0 000-14z"/>
-                        </svg>
-                        <!-- moon -->
-                        <svg class="swap-on fill-current w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                            <path d="M12 2a9.931 9.931 0 00-7.07 2.93A10 10 0 1012 2z"/>
-                        </svg>
-                    </label>
-                </div>
-                <x-dropdown align="right" width="48">
-                    <x-slot name="trigger">
-                        <button
-                            class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none transition ease-in-out duration-150">
-                            <div>{{ Auth::user()->name }}</div>
-
-                            <div class="ms-1">
-                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg"
-                                    viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd"
-                                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                                        clip-rule="evenodd" />
-                                </svg>
+            <!-- User Avatar Dropdown -->
+            <div class="dropdown dropdown-end">
+                <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
+                    <div class="w-10 h-10 rounded-full overflow-hidden">
+                        @php $user = Auth::user(); @endphp
+                        @if ($user && $user->avatar_path)
+                            <img alt="{{ $user->name }}" src="{{ Storage::url($user->avatar_path) }}"
+                                class="w-10 h-10 object-cover" />
+                        @elseif ($user && $user->profile_photo_path)
+                            <img alt="{{ $user->name }}" src="{{ Storage::url($user->profile_photo_path) }}"
+                                class="w-10 h-10 object-cover" />
+                        @else
+                            <div
+                                class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-semibold">
+                                {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
                             </div>
-                        </button>
-                    </x-slot>
-
-                    <x-slot name="content">
-                        <x-dropdown-link :href="route('profile.edit')">
-                            {{ __('Profile') }}
-                        </x-dropdown-link>
-
-                        <!-- Authentication -->
+                        @endif
+                    </div>
+                </div>
+                <ul tabindex="0"
+                    class="menu menu-sm dropdown-content mt-3 z-[60] p-2 shadow bg-base-100 rounded-box w-52">
+                    <li class="menu-title">
+                        <span>{{ Auth::user()->name }}</span>
+                    </li>
+                    <li>
+                        <a href="{{ route('profile.edit') }}" class="justify-between">
+                            <span class="flex items-center">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                </svg>
+                                Perfil
+                            </span>
+                            @if (Auth::user()->role && Auth::user()->role->name === 'Estudiante')
+                                <span class="badge badge-primary">Estudiante</span>
+                            @else
+                                <span class="badge badge-secondary">Profesor</span>
+                            @endif
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                            Configuración
+                        </a>
+                    </li>
+                    <div class="divider my-1"></div>
+                    <li>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
-
-                            <x-dropdown-link :href="route('logout')"
-                                onclick="event.preventDefault();
-                                                this.closest('form').submit();">
-                                {{ __('Log Out') }}
-                            </x-dropdown-link>
+                            <a href="{{ route('logout') }}"
+                                onclick="event.preventDefault(); this.closest('form').submit();" class="text-error">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                                </svg>
+                                Cerrar Sesión
+                            </a>
                         </form>
-                    </x-slot>
-                </x-dropdown>
+                    </li>
+                </ul>
             </div>
+        @else
+            <!-- Guest Navigation -->
+            <div class="flex gap-2">
+                <a href="{{ route('login') }}" class="btn btn-ghost">Iniciar Sesión</a>
+                <a href="{{ route('register') }}" class="btn btn-primary">Registrarse</a>
+            </div>
+        @endauth
 
-            <!-- Hamburger -->
-            <div class="-me-2 flex items-center sm:hidden">
-                <button @click="open = ! open"
-                    class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-900 focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-900 focus:text-gray-500 dark:focus:text-gray-400 transition duration-150 ease-in-out">
-                    <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                        <path :class="{ 'hidden': open, 'inline-flex': !open }" class="inline-flex"
-                            stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M4 6h16M4 12h16M4 18h16" />
-                        <path :class="{ 'hidden': !open, 'inline-flex': open }" class="hidden" stroke-linecap="round"
-                            stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
+        <!-- Mobile Menu Button -->
+        <div class="dropdown dropdown-end lg:hidden">
+            <div tabindex="0" role="button" class="btn btn-ghost btn-circle">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
             </div>
+            <ul tabindex="0"
+                class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-72">
+                <li class="px-2 py-1">
+                    <form action="{{ route('courses.search') }}" method="GET">
+                        <div class="join w-full">
+                            <input type="search" name="q" value="{{ request('q') }}"
+                                class="input input-bordered join-item w-full outline-none focus:outline-none focus:ring-0 focus:border-primary"
+                                placeholder="Que curso estas buscando..." />
+                            <button type="submit" class="btn btn-primary join-item">Ir</button>
+                        </div>
+                    </form>
+                </li>
+                @auth
+                    <li><a href="{{ route('dashboard') }}">Mi Panel</a></li>
+                    @if (Auth::user()->role && Auth::user()->role->name === 'Profesor')
+                        <li><a href="{{ route('courses.index') }}">Mis Cursos</a></li>
+                    @else
+                        <li><a href="{{ route('student.my-courses') }}">Mis Cursos</a></li>
+                        <li><a href="{{ route('student.messages') }}">Mensajes</a></li>
+                    @endif
+                @else
+                    <li><a href="{{ route('login') }}">Iniciar Sesión</a></li>
+                    <li><a href="{{ route('register') }}">Registrarse</a></li>
+                @endauth
+            </ul>
         </div>
     </div>
-
-    <!-- Responsive Navigation Menu -->
-    <div :class="{ 'block': open, 'hidden': !open }" class="hidden sm:hidden">
-        <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                {{ __('Dashboard') }}
-            </x-responsive-nav-link>
-            <!-- Theme Toggle (mobile) -->
-            <div class="px-4 py-2">
-                <label class="label cursor-pointer gap-2">
-                    <span class="label-text">Tema oscuro</span>
-                    <input type="checkbox" class="toggle"
-                           x-data="{dark:(document.documentElement.getAttribute('data-theme')==='dark')}"
-                           :checked="dark"
-                           @change="dark=!dark; const t = dark ? 'dark':'light'; const root = document.documentElement; root.setAttribute('data-theme', t); if(t==='dark') root.classList.add('dark'); else root.classList.remove('dark'); try{localStorage.setItem('theme', t)}catch(e){}; window.dispatchEvent(new CustomEvent('theme-changed', { detail: t }));" />
-                </label>
-            </div>
-        </div>
-
-        <!-- Responsive Settings Options -->
-        <div class="pt-4 pb-1 border-t border-gray-200 dark:border-gray-600">
-            <div class="px-4">
-                <div class="font-medium text-base text-gray-800 dark:text-gray-200">{{ Auth::user()->name }}</div>
-                <div class="font-medium text-sm text-gray-500">{{ Auth::user()->email }}</div>
-            </div>
-
-            <div class="mt-3 space-y-1">
-                <x-responsive-nav-link :href="route('profile.edit')">
-                    {{ __('Profile') }}
-                </x-responsive-nav-link>
-
-                <!-- Authentication -->
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-
-                    <x-responsive-nav-link :href="route('logout')"
-                        onclick="event.preventDefault();
-                                        this.closest('form').submit();">
-                        {{ __('Log Out') }}
-                    </x-responsive-nav-link>
-                </form>
-            </div>
-        </div>
-    </div>
-</nav>
+</div>

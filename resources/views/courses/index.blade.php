@@ -1,69 +1,95 @@
+@php
+    use Illuminate\Support\Facades\Storage;
+@endphp
+
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+        <h2 class="font-semibold text-xl text-base-content leading-tight">
             {{ __('Mis Cursos') }}
         </h2>
     </x-slot>
 
     <div class="py-6">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                @if(session('status'))
-                    <div class="alert alert-success mb-4">
-                        {{ session('status') }}
-                    </div>
-                @endif
+            @if (session('status'))
+                <div class="alert alert-success mb-4">
+                    {{ session('status') }}
+                </div>
+            @endif
             <div class="flex justify-end mb-4">
-                    <a href="{{ route('courses.create') }}" class="btn btn-primary">Nuevo curso</a>
+                <a href="{{ route('courses.create') }}" class="btn btn-primary">Nuevo curso</a>
             </div>
             @if (session('status'))
                 <div class="mb-4 p-3 bg-green-100 text-green-700 rounded">{{ session('status') }}</div>
             @endif
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
-                    <table class="min-w-full text-sm">
-                        <thead>
-                            <tr class="text-left border-b">
-                                <th class="py-2 pr-4">Título</th>
-                                <th class="py-2 pr-4">Categoría</th>
-                                <th class="py-2 pr-4">Subcategoría</th>
-                                <th class="py-2 pr-4">Precio</th>
-                                <th class="py-2 pr-4">Nivel</th>
-                                <th class="py-2 pr-4">Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse ($courses as $course)
-                                <tr class="border-b">
-                                    <td class="py-2 pr-4">{{ $course->title }}</td>
-                                    <td class="py-2 pr-4">{{ $course->category->name ?? '-' }}</td>
-                                    <td class="py-2 pr-4">{{ $course->subCategory->name ?? '-' }}</td>
-                                    <td class="py-2 pr-4">$ {{ number_format($course->price, 2) }}</td>
-                                    <td class="py-2 pr-4">{{ $course->level ?? '-' }}</td>
-                                    <td class="py-2 pr-4 space-x-2">
-                                        <a href="{{ route('courses.edit', $course) }}"
-                                            class="text-indigo-600 hover:underline">Editar</a>
-                                        <a href="{{ route('courses.wizard', $course) }}"
-                                            class="text-amber-600 hover:underline">Asistente</a>
-                                        <form action="{{ route('courses.destroy', $course) }}" method="POST"
-                                            class="inline" onsubmit="return confirm('¿Eliminar curso?')">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button class="text-red-600 hover:underline"
-                                                type="submit">Eliminar</button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="6" class="py-4 text-center text-gray-500">No tienes cursos aún.</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+            <div class="bg-base-100 overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-base-content">
+                    @if ($courses->count())
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                            @foreach ($courses as $course)
+                                <div class="card bg-base-100 w-full shadow-sm">
+                                    <figure>
+                                        @if ($course->image_path && Storage::exists($course->image_path))
+                                            <img src="{{ Storage::url($course->image_path) }}"
+                                                alt="{{ $course->title }}" class="w-full h-48 object-cover" />
+                                        @else
+                                            <div class="w-full h-48 bg-base-200 flex items-center justify-center">
+                                                <div class="text-center">
+                                                    <svg class="mx-auto h-12 w-12 text-base-content/40" fill="none"
+                                                        viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                    </svg>
+                                                    <p class="mt-2 text-sm text-base-content/60">Imagen no disponible
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        @endif
+                                    </figure>
+                                    <div class="card-body">
+                                        <h2 class="card-title">
+                                            {{ $course->title }}
+                                            <div class="badge badge-secondary">NEW</div>
+                                        </h2>
 
-                    <div class="mt-4">
-                        {{ $courses->links() }}
-                    </div>
+                                        <p class="text-sm text-base-content/80">
+                                            {{ Str::limit($course->description ?? ($course->subtitle ?? 'Sin descripción'), 120) }}
+                                        </p>
+
+                                        <div class="card-actions justify-between items-center mt-4">
+                                            <div class="flex items-center space-x-2">
+                                                <div class="text-xs text-base-content/70">
+                                                    {{ $course->category->name ?? '-' }}</div>
+                                                @if (!empty($course->subCategory->name))
+                                                    <div class="badge badge-outline">{{ $course->subCategory->name }}
+                                                    </div>
+                                                @endif
+                                            </div>
+
+                                            <div class="flex items-center space-x-2">
+                                                <div class="text-sm font-medium">$
+                                                    {{ number_format($course->price ?? 0, 2) }}</div>
+                                            </div>
+                                        </div>
+
+                                        <div class="card-actions justify-end mt-2">
+                                            <a href="{{ route('courses.edit', $course) }}"
+                                                class="btn btn-ghost btn-sm">Editar</a>
+                                            <a href="{{ route('courses.wizard', $course) }}"
+                                                class="btn btn-outline btn-sm">Asistente</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+
+                        <div class="mt-6">
+                            {{ $courses->links() }}
+                        </div>
+                    @else
+                        <div class="py-8 text-center text-base-content/60">No tienes cursos aún.</div>
+                    @endif
                 </div>
             </div>
         </div>

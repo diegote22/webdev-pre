@@ -39,11 +39,23 @@
                 <a href="#" class="text-gray-700 hover:text-purple-700">Contacto</a>
             </div>
             <div class="flex items-center gap-3">
-                <a href="{{ route('login') }}"
-                    class="px-4 py-2 text-sm font-medium text-gray-700 bg-white rounded-lg border border-gray-200 hover:bg-gray-100">Iniciar
-                    Sesión</a>
-                <a href="{{ route('register') }}"
-                    class="px-4 py-2 text-sm font-medium text-white bg-purple-700 rounded-lg hover:bg-purple-800">Registrarse</a>
+                @auth
+                    <a href="{{ route('dashboard') }}"
+                        class="px-4 py-2 text-sm font-medium text-white bg-purple-700 rounded-lg hover:bg-purple-800">Ir a
+                        mi Panel</a>
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit"
+                            class="px-4 py-2 text-sm font-medium text-gray-700 bg-white rounded-lg border border-gray-200 hover:bg-gray-100">Cerrar
+                            sesión</button>
+                    </form>
+                @else
+                    <a href="{{ route('login') }}"
+                        class="px-4 py-2 text-sm font-medium text-gray-700 bg-white rounded-lg border border-gray-200 hover:bg-gray-100">Iniciar
+                        Sesión</a>
+                    <a href="{{ route('register') }}"
+                        class="px-4 py-2 text-sm font-medium text-white bg-purple-700 rounded-lg hover:bg-purple-800">Registrarse</a>
+                @endauth
             </div>
         </nav>
     </header>

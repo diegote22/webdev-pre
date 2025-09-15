@@ -8,6 +8,7 @@ use App\Models\SubCategory;
 use App\Models\CourseGoal;
 use App\Models\CourseRequirement;
 use App\Models\Section;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Lesson;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
@@ -101,7 +102,7 @@ class CourseController extends Controller
 
     protected function authorizeOwner(Course $course): void
     {
-        if (auth()->id() !== $course->user_id) {
+        if (Auth::id() !== $course->user_id) {
             abort(403);
         }
     }
@@ -427,5 +428,86 @@ class CourseController extends Controller
         }
         $attachment->delete();
         return back()->with(['status' => 'Material eliminado', 'activeTab' => 'sections']);
+    }
+
+    // Métodos públicos para mostrar cursos por categoría
+    public function secundaria(): View
+    {
+        $courses = Course::whereHas('category', function ($query) {
+            $query->where('name', 'LIKE', '%Secundaria%');
+        })->with(['category', 'subCategory', 'professor'])->paginate(12);
+
+        return view('courses.public.category', [
+            'courses' => $courses,
+            'categoryName' => 'Secundaria',
+            'categoryDescription' => 'Refuerza tus conocimientos y prepárate para los exámenes.'
+        ]);
+    }
+
+    public function preUniversitario(): View
+    {
+        $courses = Course::whereHas('category', function ($query) {
+            $query->where('name', 'LIKE', '%Pre-Universitario%');
+        })->with(['category', 'subCategory', 'professor'])->paginate(12);
+
+        return view('courses.public.category', [
+            'courses' => $courses,
+            'categoryName' => 'Pre-Universitario',
+            'categoryDescription' => 'Prepárate para el ingreso universitario con los mejores profesores.'
+        ]);
+    }
+
+    public function universitario(): View
+    {
+        $courses = Course::whereHas('category', function ($query) {
+            $query->where('name', 'LIKE', '%Universitario%');
+        })->with(['category', 'subCategory', 'professor'])->paginate(12);
+
+        return view('courses.public.category', [
+            'courses' => $courses,
+            'categoryName' => 'Universitario',
+            'categoryDescription' => 'Complementa tu formación universitaria con cursos especializados.'
+        ]);
+    }
+
+    // Método público para mostrar el detalle de un curso
+    public function show(Course $course): View
+    {
+        $course->load([
+            'category',
+            'subCategory',
+            'professor',
+            'goals',
+            'requirements',
+            'sections.lessons' => function ($query) {
+                $query->orderBy('position');
+            }
+        ]);
+
+        return view('courses.public.show', compact('course'));
+    }
+
+    // Búsqueda pública de cursos
+    public function search(Request $request): View
+    {
+        $q = trim((string) $request->get('q', ''));
+
+        $courses = Course::query()
+            ->with(['category', 'subCategory', 'professor'])
+            ->when($q !== '', function ($query) use ($q) {
+                $query->where(function ($sub) use ($q) {
+                    $sub->where('title', 'like', "%{$q}%")
+                        ->orWhere('description', 'like', "%{$q}%")
+                        ->orWhere('summary', 'like', "%{$q}%");
+                });
+            })
+            ->latest('id')
+            ->paginate(12)
+            ->withQueryString();
+
+        return view('courses.public.search', [
+            'courses' => $courses,
+            'q' => $q,
+        ]);
     }
 }

@@ -1,5 +1,9 @@
+@php
+    use Illuminate\Support\Facades\Storage;
+@endphp
+
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" data-theme="light">
 
 <head>
     <meta charset="utf-8">
@@ -10,8 +14,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Scripts -->
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <!-- Alpine.js for interactivity -->
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -41,31 +45,78 @@
 <body class="bg-gray-50 text-gray-800">
 
     <!-- =========== Header =========== -->
-    <header class="bg-white shadow-sm sticky top-0 z-50">
-        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
-            <div>
-                <!-- El logo se cargaría desde la carpeta public de Laravel -->
-                <a href="/" class="text-2xl font-bold text-blue-600">WebDev-Pre</a>
-                <!-- <img src="{{ asset('logo.svg') }}" alt="Logo WebDev-Pre" class="h-10"> -->
+    <div class="navbar bg-base-100 shadow-sm sticky top-0 z-50">
+        <!-- Logo/Brand -->
+        <div class="navbar-start">
+            <a href="/" class="btn btn-ghost text-xl font-bold text-primary">
+                <svg class="w-8 h-8 mr-2" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2L2 7v10c0 5.55 3.84 9.74 9 11 5.16-1.26 9-5.45 9-11V7l-10-5z" />
+                    <path d="M8 11h8v2H8v-2zm0 4h8v2H8v-2z" fill="white" />
+                </svg>
+                WebDev-Pre
+            </a>
+        </div>
+
+        <!-- Navigation Menu (Desktop) -->
+        <div class="navbar-center hidden lg:flex">
+            <ul class="menu menu-horizontal px-1 gap-2">
+                <li><a href="#secundaria" class="btn btn-ghost">Secundaria</a></li>
+                <li><a href="#pre-universitario" class="btn btn-ghost">Pre-Universitario</a></li>
+                <li><a href="#universitario" class="btn btn-ghost">Universitario</a></li>
+                <li><a href="#nosotros" class="btn btn-ghost">Nosotros</a></li>
+                <li><a href="#preguntas" class="btn btn-ghost">Preguntas</a></li>
+            </ul>
+        </div>
+
+        <!-- Right Side - Auth buttons -->
+        <div class="navbar-end">
+            <div class="flex gap-2">
+                @auth
+                    <a href="{{ route('dashboard') }}" class="btn btn-primary">Ir a mi Panel</a>
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <a href="{{ route('logout') }}" class="btn btn-ghost"
+                            onclick="event.preventDefault(); this.closest('form').submit();">Cerrar sesión</a>
+                    </form>
+                @else
+                    <a href="{{ route('login') }}" class="btn btn-ghost">Iniciar Sesión</a>
+                    <a href="{{ route('register') }}" class="btn btn-primary">Registrarse</a>
+                @endauth
             </div>
-            <div class="hidden md:flex items-center space-x-6">
-                <a href="#secundaria" class="text-gray-600 hover:text-blue-600 transition duration-300">Secundaria</a>
-                <a href="#pre-universitario"
-                    class="text-gray-600 hover:text-blue-600 transition duration-300">Pre-Universitario</a>
-                <a href="#universitario"
-                    class="text-gray-600 hover:text-blue-600 transition duration-300">Universitario</a>
-                <a href="#nosotros" class="text-gray-600 hover:text-blue-600 transition duration-300">Nosotros</a>
-                <a href="#preguntas" class="text-gray-600 hover:text-blue-600 transition duration-300">Preguntas</a>
+
+            <!-- Mobile Menu Button -->
+            <div class="dropdown dropdown-end lg:hidden ml-2">
+                <div tabindex="0" role="button" class="btn btn-ghost btn-circle">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </div>
+                <ul tabindex="0"
+                    class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
+                    <li><a href="#secundaria">Secundaria</a></li>
+                    <li><a href="#pre-universitario">Pre-Universitario</a></li>
+                    <li><a href="#universitario">Universitario</a></li>
+                    <li><a href="#nosotros">Nosotros</a></li>
+                    <li><a href="#preguntas">Preguntas</a></li>
+                    <div class="divider"></div>
+                    @auth
+                        <li><a href="{{ route('dashboard') }}">Ir a mi Panel</a></li>
+                        <li>
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <a href="{{ route('logout') }}"
+                                    onclick="event.preventDefault(); this.closest('form').submit();">Cerrar sesión</a>
+                            </form>
+                        </li>
+                    @else
+                        <li><a href="{{ route('login') }}">Iniciar Sesión</a></li>
+                        <li><a href="{{ route('register') }}">Registrarse</a></li>
+                    @endauth
+                </ul>
             </div>
-            <div class="flex items-center space-x-3">
-                <a href="/login"
-                    class="px-5 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition duration-300">Iniciar
-                    Sesión</a>
-                <a href="/register"
-                    class="px-5 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition duration-300">Registrarse</a>
-            </div>
-        </nav>
-    </header>
+        </div>
+    </div>
 
     <main>
         <!-- =========== 1. Hero Section =========== -->
@@ -136,83 +187,219 @@
                         <h2 class="text-3xl font-bold text-gray-900">Cursos de Secundaria</h2>
                         <p class="text-gray-600 mt-2">Refuerza tus conocimientos y prepárate para los exámenes.</p>
                     </div>
-                    <div class="hidden md:flex items-center gap-2">
-                        <button @click="prev()"
-                            class="w-10 h-10 flex items-center justify-center bg-white rounded-full shadow-md hover:bg-gray-100 transition">‹</button>
-                        <button @click="next()"
-                            class="w-10 h-10 flex items-center justify-center bg-white rounded-full shadow-md hover:bg-gray-100 transition">›</button>
-                    </div>
+                    @if ($secundariaCourses->count() > 0)
+                        <div class="hidden md:flex items-center gap-2">
+                            <button @click="prev()"
+                                class="w-10 h-10 flex items-center justify-center bg-white rounded-full shadow-md hover:bg-gray-100 transition">‹</button>
+                            <button @click="next()"
+                                class="w-10 h-10 flex items-center justify-center bg-white rounded-full shadow-md hover:bg-gray-100 transition">›</button>
+                        </div>
+                    @endif
                 </div>
-                <div class="relative">
-                    <div x-ref="slider" class="flex overflow-x-auto snap-x snap-mandatory scroll-smooth"
-                        style="-ms-overflow-style: none; scrollbar-width: none;">
-                        <!-- Ejemplo de 5 Cursos -->
-                        <div class="flex-shrink-0 w-full sm:w-1/2 md:w-1/3 lg:w-1/4 p-3 snap-start">
-                            <div class="bg-white rounded-lg shadow-lg overflow-hidden">
-                                <img src="https://placehold.co/400x250/3b82f6/ffffff?text=Matemática+3er+Año"
-                                    alt="Curso" class="w-full h-48 object-cover">
-                                <div class="p-5">
-                                    <h3 class="font-bold text-lg">Matemática 3er Año</h3>
-                                    <p class="text-gray-600 text-sm mt-1">Prof. Juan Pérez</p>
-                                    <div class="mt-4 font-bold text-xl text-blue-600">$2500 ARS</div>
+
+                @if ($secundariaCourses->count() > 0)
+                    <div class="relative">
+                        <div x-ref="slider" class="flex overflow-x-auto snap-x snap-mandatory scroll-smooth"
+                            style="-ms-overflow-style: none; scrollbar-width: none;">
+                            @foreach ($secundariaCourses as $course)
+                                <div class="flex-shrink-0 w-full sm:w-1/2 md:w-1/3 lg:w-1/4 p-3 snap-start">
+                                    <div
+                                        class="bg-white rounded-lg shadow-lg overflow-hidden transform transition-all duration-300 hover:shadow-2xl hover:scale-105 hover:-translate-y-2 cursor-pointer group">
+                                        @if ($course->image_path && Storage::exists($course->image_path))
+                                            <img src="{{ Storage::url($course->image_path) }}"
+                                                alt="{{ $course->title }}"
+                                                class="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300">
+                                        @else
+                                            <div
+                                                class="w-full h-48 bg-gradient-to-r from-blue-400 to-blue-600 flex items-center justify-center group-hover:from-blue-500 group-hover:to-blue-700 transition-all duration-300">
+                                                <span
+                                                    class="text-white font-bold text-lg group-hover:scale-105 transition-transform duration-300">{{ $course->title }}</span>
+                                            </div>
+                                        @endif
+                                        <div class="p-5">
+                                            <h3
+                                                class="font-bold text-lg group-hover:text-blue-600 transition-colors duration-300">
+                                                {{ $course->title }}</h3>
+                                            <p class="text-gray-600 text-sm mt-1">
+                                                {{ $course->professor->name ?? 'Profesor' }}</p>
+                                            <div
+                                                class="mt-4 font-bold text-xl text-blue-600 group-hover:text-blue-700 transition-colors duration-300">
+                                                ${{ number_format($course->price, 2) }} ARS</div>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
-                        <!-- Repite la tarjeta del curso 4 veces más -->
-                        <div class="flex-shrink-0 w-full sm:w-1/2 md:w-1/3 lg:w-1/4 p-3 snap-start">
-                            <div class="bg-white rounded-lg shadow-lg overflow-hidden">
-                                <img src="https://placehold.co/400x250/10b981/ffffff?text=Biología+Celular"
-                                    alt="Curso" class="w-full h-48 object-cover">
-                                <div class="p-5">
-                                    <h3 class="font-bold text-lg">Biología Celular</h3>
-                                    <p class="text-gray-600 text-sm mt-1">Prof. Ana Gómez</p>
-                                    <div class="mt-4 font-bold text-xl text-blue-600">$3000 ARS</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="flex-shrink-0 w-full sm:w-1/2 md:w-1/3 lg:w-1/4 p-3 snap-start">
-                            <div class="bg-white rounded-lg shadow-lg overflow-hidden">
-                                <img src="https://placehold.co/400x250/f97316/ffffff?text=Física+General"
-                                    alt="Curso" class="w-full h-48 object-cover">
-                                <div class="p-5">
-                                    <h3 class="font-bold text-lg">Física General</h3>
-                                    <p class="text-gray-600 text-sm mt-1">Prof. Carlos Ruiz</p>
-                                    <div class="mt-4 font-bold text-xl text-blue-600">$2800 ARS</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="flex-shrink-0 w-full sm:w-1/2 md:w-1/3 lg:w-1/4 p-3 snap-start">
-                            <div class="bg-white rounded-lg shadow-lg overflow-hidden">
-                                <img src="https://placehold.co/400x250/8b5cf6/ffffff?text=Química+Orgánica"
-                                    alt="Curso" class="w-full h-48 object-cover">
-                                <div class="p-5">
-                                    <h3 class="font-bold text-lg">Química Orgánica</h3>
-                                    <p class="text-gray-600 text-sm mt-1">Prof. Laura Méndez</p>
-                                    <div class="mt-4 font-bold text-xl text-blue-600">$3200 ARS</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="flex-shrink-0 w-full sm:w-1/2 md:w-1/3 lg:w-1/4 p-3 snap-start">
-                            <div class="bg-white rounded-lg shadow-lg overflow-hidden">
-                                <img src="https://placehold.co/400x250/ec4899/ffffff?text=Historia+Argentina"
-                                    alt="Curso" class="w-full h-48 object-cover">
-                                <div class="p-5">
-                                    <h3 class="font-bold text-lg">Historia Argentina</h3>
-                                    <p class="text-gray-600 text-sm mt-1">Prof. Sofía Castro</p>
-                                    <div class="mt-4 font-bold text-xl text-blue-600">$2200 ARS</div>
-                                </div>
-                            </div>
+                            @endforeach
                         </div>
                     </div>
-                </div>
-                <div class="text-center mt-10">
-                    <a href="/cursos/secundaria"
-                        class="px-8 py-3 font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition duration-300">Ver
-                        los cursos Secundarios</a>
-                </div>
+                    <div class="text-center mt-10">
+                        <a href="/cursos/secundaria"
+                            class="px-8 py-3 font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition duration-300">Ver
+                            los cursos Secundarios</a>
+                    </div>
+                @else
+                    <div class="text-center py-12">
+                        <div class="bg-gray-100 rounded-lg p-8">
+                            <svg class="mx-auto h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                            </svg>
+                            <h3 class="mt-4 text-lg font-medium text-gray-900">Por el momento no hay cursos disponibles
+                            </h3>
+                            <p class="mt-2 text-gray-500">Los cursos de Secundaria estarán disponibles próximamente.
+                            </p>
+                        </div>
+                    </div>
+                @endif
             </div>
 
-            <!-- Aquí irían los otros dos carruseles para Pre-Universitario y Universitario, con la misma estructura -->
+            <!-- Carrusel: Pre-Universitario -->
+            <div x-data="carousel()">
+                <div class="flex justify-between items-end mb-8">
+                    <div>
+                        <h2 class="text-3xl font-bold text-gray-900">Cursos Pre-Universitarios</h2>
+                        <p class="text-gray-600 mt-2">Prepárate para el ingreso universitario con los mejores
+                            profesores.</p>
+                    </div>
+                    @if ($preUniversitarioCourses->count() > 0)
+                        <div class="hidden md:flex items-center gap-2">
+                            <button @click="prev()"
+                                class="w-10 h-10 flex items-center justify-center bg-white rounded-full shadow-md hover:bg-gray-100 transition">‹</button>
+                            <button @click="next()"
+                                class="w-10 h-10 flex items-center justify-center bg-white rounded-full shadow-md hover:bg-gray-100 transition">›</button>
+                        </div>
+                    @endif
+                </div>
+
+                @if ($preUniversitarioCourses->count() > 0)
+                    <div class="relative">
+                        <div x-ref="slider" class="flex overflow-x-auto snap-x snap-mandatory scroll-smooth"
+                            style="-ms-overflow-style: none; scrollbar-width: none;">
+                            @foreach ($preUniversitarioCourses as $course)
+                                <div class="flex-shrink-0 w-full sm:w-1/2 md:w-1/3 lg:w-1/4 p-3 snap-start">
+                                    <div
+                                        class="bg-white rounded-lg shadow-lg overflow-hidden transform transition-all duration-300 hover:shadow-2xl hover:scale-105 hover:-translate-y-2 cursor-pointer group">
+                                        @if ($course->image_path && Storage::exists($course->image_path))
+                                            <img src="{{ Storage::url($course->image_path) }}"
+                                                alt="{{ $course->title }}"
+                                                class="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300">
+                                        @else
+                                            <div
+                                                class="w-full h-48 bg-gradient-to-r from-green-400 to-green-600 flex items-center justify-center group-hover:from-green-500 group-hover:to-green-700 transition-all duration-300">
+                                                <span
+                                                    class="text-white font-bold text-lg group-hover:scale-105 transition-transform duration-300">{{ $course->title }}</span>
+                                            </div>
+                                        @endif
+                                        <div class="p-5">
+                                            <h3
+                                                class="font-bold text-lg group-hover:text-green-600 transition-colors duration-300">
+                                                {{ $course->title }}</h3>
+                                            <p class="text-gray-600 text-sm mt-1">
+                                                {{ $course->professor->name ?? 'Profesor' }}</p>
+                                            <div
+                                                class="mt-4 font-bold text-xl text-blue-600 group-hover:text-green-600 transition-colors duration-300">
+                                                ${{ number_format($course->price, 2) }} ARS</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                    <div class="text-center mt-10">
+                        <a href="/cursos/pre-universitario"
+                            class="px-8 py-3 font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition duration-300">Ver
+                            los cursos Pre-Universitarios</a>
+                    </div>
+                @else
+                    <div class="text-center py-12">
+                        <div class="bg-gray-100 rounded-lg p-8">
+                            <svg class="mx-auto h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                            </svg>
+                            <h3 class="mt-4 text-lg font-medium text-gray-900">Por el momento no hay cursos disponibles
+                            </h3>
+                            <p class="mt-2 text-gray-500">Los cursos Pre-Universitarios estarán disponibles
+                                próximamente.</p>
+                        </div>
+                    </div>
+                @endif
+            </div>
+
+            <!-- Carrusel: Universitario -->
+            <div x-data="carousel()">
+                <div class="flex justify-between items-end mb-8">
+                    <div>
+                        <h2 class="text-3xl font-bold text-gray-900">Cursos Universitarios</h2>
+                        <p class="text-gray-600 mt-2">Complementa tu formación universitaria con cursos especializados.
+                        </p>
+                    </div>
+                    @if ($universitarioCourses->count() > 0)
+                        <div class="hidden md:flex items-center gap-2">
+                            <button @click="prev()"
+                                class="w-10 h-10 flex items-center justify-center bg-white rounded-full shadow-md hover:bg-gray-100 transition">‹</button>
+                            <button @click="next()"
+                                class="w-10 h-10 flex items-center justify-center bg-white rounded-full shadow-md hover:bg-gray-100 transition">›</button>
+                        </div>
+                    @endif
+                </div>
+
+                @if ($universitarioCourses->count() > 0)
+                    <div class="relative">
+                        <div x-ref="slider" class="flex overflow-x-auto snap-x snap-mandatory scroll-smooth"
+                            style="-ms-overflow-style: none; scrollbar-width: none;">
+                            @foreach ($universitarioCourses as $course)
+                                <div class="flex-shrink-0 w-full sm:w-1/2 md:w-1/3 lg:w-1/4 p-3 snap-start">
+                                    <div
+                                        class="bg-white rounded-lg shadow-lg overflow-hidden transform transition-all duration-300 hover:shadow-2xl hover:scale-105 hover:-translate-y-2 cursor-pointer group">
+                                        @if ($course->image_path && Storage::exists($course->image_path))
+                                            <img src="{{ Storage::url($course->image_path) }}"
+                                                alt="{{ $course->title }}"
+                                                class="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300">
+                                        @else
+                                            <div
+                                                class="w-full h-48 bg-gradient-to-r from-purple-400 to-purple-600 flex items-center justify-center group-hover:from-purple-500 group-hover:to-purple-700 transition-all duration-300">
+                                                <span
+                                                    class="text-white font-bold text-lg group-hover:scale-105 transition-transform duration-300">{{ $course->title }}</span>
+                                            </div>
+                                        @endif
+                                        <div class="p-5">
+                                            <h3
+                                                class="font-bold text-lg group-hover:text-purple-600 transition-colors duration-300">
+                                                {{ $course->title }}</h3>
+                                            <p class="text-gray-600 text-sm mt-1">
+                                                {{ $course->professor->name ?? 'Profesor' }}</p>
+                                            <div
+                                                class="mt-4 font-bold text-xl text-blue-600 group-hover:text-purple-600 transition-colors duration-300">
+                                                ${{ number_format($course->price, 2) }} ARS</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                    <div class="text-center mt-10">
+                        <a href="/cursos/universitario"
+                            class="px-8 py-3 font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition duration-300">Ver
+                            los cursos Universitarios</a>
+                    </div>
+                @else
+                    <div class="text-center py-12">
+                        <div class="bg-gray-100 rounded-lg p-8">
+                            <svg class="mx-auto h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                            </svg>
+                            <h3 class="mt-4 text-lg font-medium text-gray-900">Por el momento no hay cursos disponibles
+                            </h3>
+                            <p class="mt-2 text-gray-500">Los cursos Universitarios estarán disponibles próximamente.
+                            </p>
+                        </div>
+                    </div>
+                @endif
+            </div>
 
         </section>
 

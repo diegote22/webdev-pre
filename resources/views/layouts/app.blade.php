@@ -14,28 +14,17 @@
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <script>
-        (function(){
-            try {
-                const stored = localStorage.getItem('theme');
-                const def = stored ? stored : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-                const root = document.documentElement;
-                root.setAttribute('data-theme', def);
-                // Activar variantes dark: de Tailwind (por clase)
-                if(def === 'dark') root.classList.add('dark'); else root.classList.remove('dark');
-            } catch (e) {}
-        })();
-    </script>
+
 </head>
 
 <body class="font-sans antialiased">
-    <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
+    <div class="min-h-screen bg-base-200">
         @include('layouts.navigation')
 
         <!-- Page Heading -->
         @isset($header)
-            <header class="bg-gray-100 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-                <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 text-black dark:text-white">
+            <header class="bg-base-100 border-b border-base-300">
+                <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 text-base-content">
                     {{ $header }}
                 </div>
             </header>
@@ -56,15 +45,7 @@
             </div>
         @endif
 
-        <!-- Toast para cambios de tema (cliente) -->
-        <div x-data="{ show:false, msg:'', type:'info', notify(theme){ this.msg = theme==='dark' ? 'Tema: oscuro' : 'Tema: claro'; this.type='info'; this.show = true; setTimeout(()=> this.show=false, 2000) } }"
-             x-on:theme-changed.window="notify($event.detail)"
-             x-show="show" x-transition
-             class="toast toast-end z-50">
-            <div class="alert alert-info">
-                <span x-text="msg"></span>
-            </div>
-        </div>
+
     </div>
 </body>
 

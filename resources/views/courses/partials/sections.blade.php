@@ -7,7 +7,7 @@
         </form>
 
         @forelse($course->sections()->with(['lessons.attachments'])->orderBy('position')->get() as $section)
-            <div class="border rounded-lg p-4 bg-white shadow-sm">
+            <div class="border rounded-lg p-4 bg-base-100 border-base-300 shadow-sm">
                 <div class="flex items-center gap-2 mb-3">
                     <form method="POST" action="{{ route('courses.sections.update', [$course, $section]) }}"
                         class="flex-1 flex gap-2">
@@ -45,7 +45,7 @@
                                 </div>
 
                                 <!-- Subtítulo: Video -->
-                                <div class="text-sm font-medium text-black">Agregar video</div>
+                                <div class="text-sm font-medium text-base-content">Agregar video</div>
                                 <div class="grid grid-cols-1 md:grid-cols-3 gap-3 items-start">
                                     <div class="flex gap-2 md:col-span-2 flex-wrap">
                                         <select name="video_type" class="select select-bordered" x-model="type">
@@ -58,12 +58,12 @@
                                             placeholder="URL YouTube" class="flex-1 input input-bordered"
                                             x-show="type==='youtube'">
                                         <div class="flex items-center gap-2 w-full md:w-auto" x-show="type==='local'">
-                                            <label class="text-sm text-black whitespace-nowrap">Archivo de video</label>
+                                            <label class="text-sm text-base-content whitespace-nowrap">Archivo de video</label>
                                             <input type="file" name="video_file" accept="video/*"
                                                 class="file-input file-input-bordered" @change="onLocalVideo($event)">
                                         </div>
                                         <div class="flex items-center gap-2 w-full md:w-auto">
-                                            <label class="text-sm text-black whitespace-nowrap">Miniatura
+                                            <label class="text-sm text-base-content whitespace-nowrap">Miniatura
                                                 (opcional)</label>
                                             <input type="file" name="thumbnail" accept="image/*"
                                                 class="file-input file-input-bordered" title="Miniatura">
@@ -75,7 +75,7 @@
                                                 <a :href="youtubeUrl || initialUrl" target="_blank"
                                                     class="text-xs text-indigo-700 underline"
                                                     x-show="youtubeUrl || initialUrl">Ver en YouTube</a>
-                                                <p class="text-xs text-gray-500" x-show="!(youtubeUrl || initialUrl)">
+                                                <p class="text-xs text-base-content/60" x-show="!(youtubeUrl || initialUrl)">
                                                     Sin video</p>
                                             </div>
                                         </template>
@@ -85,13 +85,13 @@
                                                 x-show="localUrl || initialUrl" controls></video>
                                         </template>
                                         <template x-if="!type">
-                                            <p class="text-xs text-gray-500">Sin video</p>
+                                            <p class="text-xs text-base-content/60">Sin video</p>
                                         </template>
                                     </div>
                                 </div>
 
                                 <!-- Materiales de la lección -->
-                                <div class="text-sm font-medium text-black">Material de la lección (PDF/Imagen)</div>
+                                <div class="text-sm font-medium text-base-content">Material de la lección (PDF/Imagen)</div>
                                 <div class="space-y-2">
                                     <form method="POST"
                                         action="{{ route('courses.lessons.attachments.store', [$course, $section, $lesson]) }}"
@@ -115,7 +115,7 @@
                                                             class="inline-flex items-center justify-center w-10 h-10 bg-red-50 text-red-600 border rounded text-xs font-semibold">PDF</span>
                                                     @else
                                                         <span
-                                                            class="inline-flex items-center justify-center w-10 h-10 bg-gray-100 text-gray-700 border rounded text-xs font-semibold">FILE</span>
+                                                            class="inline-flex items-center justify-center w-10 h-10 bg-base-200 text-base-content border border-base-300 rounded text-xs font-semibold">FILE</span>
                                                     @endif
                                                     <a href="{{ Storage::url($att->path) }}" target="_blank"
                                                         class="text-indigo-700 underline truncate">{{ $att->name }}</a>
@@ -129,7 +129,7 @@
                                                 </form>
                                             </li>
                                         @empty
-                                            <li class="text-gray-500">Sin materiales aún.</li>
+                                            <li class="text-base-content/60">Sin materiales aún.</li>
                                         @endforelse
                                     </ul>
                                 </div>
@@ -143,7 +143,7 @@
                             </form>
                         </div>
                     @empty
-                        <p class="text-sm text-gray-500">No hay lecciones en esta sección.</p>
+                        <p class="text-sm text-base-content/60">No hay lecciones en esta sección.</p>
                     @endforelse
 
                     <div class="collapse collapse-arrow bg-base-100 border mt-2">
@@ -164,7 +164,7 @@
                             <input name="youtube_url" placeholder="URL YouTube" class="input input-bordered"
                                 x-show="type==='youtube'">
                             <div class="flex items-center gap-2" x-show="type==='local'">
-                                <label class="text-sm text-black whitespace-nowrap">Archivo de video</label>
+                                <label class="text-sm text-base-content whitespace-nowrap">Archivo de video</label>
                                 <input type="file" name="video_file" accept="video/*" class="file-input file-input-bordered"
                                     @change="onLocalVideo($event)">
                             </div>
@@ -176,7 +176,7 @@
                 <button class="ml-auto btn" type="submit">Agregar</button>
                             </div>
                             <div class="sm:col-span-6" x-show="type==='local'">
-                                <div class="text-sm text-black mb-1">Previsualización</div>
+                                <div class="text-sm text-base-content mb-1">Previsualización</div>
                                 <video :src="localUrl" class="w-64 max-w-full aspect-video rounded border"
                                     x-show="localUrl" controls></video>
                             </div>
@@ -186,7 +186,7 @@
                 </div>
             </div>
         @empty
-            <p class="text-sm text-gray-500">Aún no has creado secciones.</p>
+            <p class="text-sm text-base-content/60">Aún no has creado secciones.</p>
         @endforelse
     </div>
     <script>
