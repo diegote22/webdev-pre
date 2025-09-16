@@ -307,21 +307,42 @@
 
                         <!-- Card de Compra -->
                         <div class="bg-base-100 rounded-lg shadow-lg p-6">
-                            <div class="text-center mb-6">
-                                <div class="text-4xl font-bold text-primary mb-2">
-                                    ${{ number_format($course->price ?? 0, 2) }}
-                                    <span class="text-sm font-normal text-base-content/60">ARS</span>
+                            @php($enrolled = auth()->check() ? $course->students->contains(auth()->id()) : false)
+                            <div class="text-center mb-6 space-y-2">
+                                <div class="text-3xl font-bold text-primary">
+                                    ${{ number_format($course->price ?? 0, 2) }} <span class="text-sm font-normal text-base-content/60">ARS</span>
                                 </div>
-                                @if ($course->price > 0)
-                                    <div class="text-sm text-base-content/60 line-through">
-                                        ${{ number_format(($course->price ?? 0) * 1.3, 2) }} ARS
-                                    </div>
+                                @if(($course->price ?? 0) <= 0)
+                                    <div class="text-xs text-success">Curso gratuito</div>
+                                @endif
+                                @if(session('status'))
+                                    <div class="text-xs text-success">{{ session('status') }}</div>
+                                @endif
+                                @if(session('error'))
+                                    <div class="text-xs text-error">{{ session('error') }}</div>
                                 @endif
                             </div>
 
                             <div class="space-y-3 mb-6">
-                                <button class="btn btn-primary w-full">Añadir al carrito</button>
-                                <button class="btn btn-outline w-full">Comprar ahora</button>
+                                @auth
+                                    @if($enrolled)
+                                        <a href="{{ route('student.courses.player', $course) }}" class="btn btn-primary w-full">Ir al curso</a>
+                                    @else
+                                        @if(($course->price ?? 0) > 0)
+                                            <form method="POST" action="{{ route('checkout.pay', $course) }}" class="space-y-2">
+                                                @csrf
+                                                <button type="submit" class="btn btn-primary w-full">Comprar ahora</button>
+                                            </form>
+                                        @else
+                                            <form method="POST" action="{{ route('checkout.pay', $course) }}" class="space-y-2">
+                                                @csrf
+                                                <button type="submit" class="btn btn-success w-full">Inscribirme Gratis</button>
+                                            </form>
+                                        @endif
+                                    @endif
+                                @else
+                                    <a href="{{ route('login') }}" class="btn btn-primary w-full">Inicia sesión para comprar</a>
+                                @endauth
                             </div>
 
                             <div class="text-center text-sm text-base-content/60 mb-4">Incluye</div>
