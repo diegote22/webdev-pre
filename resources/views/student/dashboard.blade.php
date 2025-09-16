@@ -114,10 +114,10 @@
                                     @foreach ($recentCourses->take(2) as $course)
                                         <div
                                             class="card card-compact bg-base-200 shadow-md hover:shadow-lg transition-shadow">
-                                            @if ($course->image_path && Storage::exists($course->image_path))
+                                            @if ($course->has_image)
                                                 <figure class="h-32">
-                                                    <img src="{{ Storage::url($course->image_path) }}"
-                                                        alt="{{ $course->title }}" class="w-full h-full object-cover">
+                                                    <img src="{{ $course->image_url }}" alt="{{ $course->title }}"
+                                                        class="w-full h-full object-cover">
                                                 </figure>
                                             @else
                                                 <figure
@@ -177,10 +177,10 @@
                                 @foreach ($recommendedCourses->take(4) as $course)
                                     <div
                                         class="card card-compact bg-base-200 shadow-md hover:shadow-lg transition-all hover:scale-105">
-                                        @if ($course->image_path && Storage::exists($course->image_path))
+                                        @if ($course->has_image)
                                             <figure class="h-32">
-                                                <img src="{{ Storage::url($course->image_path) }}"
-                                                    alt="{{ $course->title }}" class="w-full h-full object-cover">
+                                                <img src="{{ $course->image_url }}" alt="{{ $course->title }}"
+                                                    class="w-full h-full object-cover">
                                             </figure>
                                         @else
                                             <figure

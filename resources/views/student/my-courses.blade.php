@@ -73,9 +73,9 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     @foreach ($enrolledCourses as $course)
                         <div class="card bg-base-100 shadow-xl hover:shadow-2xl transition-all duration-300 group">
-                            @if ($course->image_path && Storage::exists($course->image_path))
+                            @if ($course->has_image)
                                 <figure class="relative h-48 overflow-hidden">
-                                    <img src="{{ Storage::url($course->image_path) }}" alt="{{ $course->title }}"
+                                    <img src="{{ $course->image_url }}" alt="{{ $course->title }}"
                                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
                                 </figure>
                             @else

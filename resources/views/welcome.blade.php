@@ -25,7 +25,7 @@
             font-family: 'Inter', sans-serif;
         }
 
-        /* Animación para la marquesina de logos */
+        /* Animación para la marquesina de textos */
         @keyframes scroll {
             0% {
                 transform: translateX(0);
@@ -37,7 +37,13 @@
         }
 
         .animate-scroll {
-            animation: scroll 40s linear infinite;
+            animation: scroll 30s linear infinite;
+            will-change: transform;
+        }
+
+        /* Invertir sentido al hacer hover sobre el contenedor */
+        .marquee:hover .animate-scroll {
+            animation-direction: reverse;
         }
     </style>
 </head>
@@ -48,12 +54,9 @@
     <div class="navbar bg-base-100 shadow-sm sticky top-0 z-50">
         <!-- Logo/Brand -->
         <div class="navbar-start">
-            <a href="/" class="btn btn-ghost text-xl font-bold text-primary">
-                <svg class="w-8 h-8 mr-2" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2L2 7v10c0 5.55 3.84 9.74 9 11 5.16-1.26 9-5.45 9-11V7l-10-5z" />
-                    <path d="M8 11h8v2H8v-2zm0 4h8v2H8v-2z" fill="white" />
-                </svg>
-                WebDev-Pre
+            <a href="/" class="btn btn-ghost text-xl font-bold text-primary gap-2 items-center">
+                <img src="{{ asset('img/webdev.png') }}" alt="WebDev-Pre" class="h-8 w-auto" loading="lazy" />
+                <span class="hidden sm:inline">WebDev-Pre</span>
             </a>
         </div>
 
@@ -68,9 +71,9 @@
             </ul>
         </div>
 
-        <!-- Right Side - Auth buttons -->
+        <!-- Right Side - Auth buttons + Avatar P -->
         <div class="navbar-end">
-            <div class="flex gap-2">
+            <div class="flex gap-2 items-center">
                 @auth
                     <a href="{{ route('dashboard') }}" class="btn btn-primary">Ir a mi Panel</a>
                     <form method="POST" action="{{ route('logout') }}">
@@ -78,44 +81,74 @@
                         <a href="{{ route('logout') }}" class="btn btn-ghost"
                             onclick="event.preventDefault(); this.closest('form').submit();">Cerrar sesión</a>
                     </form>
+                    <div class="relative">
+                        <div
+                            class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-semibold">
+                            P</div>
+                        @php
+                            $user = Auth::user();
+                            $roleName = optional($user?->role)->name;
+                            $roleNorm = $roleName ? strtolower(trim($roleName)) : null;
+                            $isProfessor = in_array($roleNorm, ['profesor', 'docente'], true);
+                            $badgeText =
+                                $roleNorm === 'administrador'
+                                    ? 'Admin'
+                                    : ($isProfessor
+                                        ? 'Profe'
+                                        : ($roleNorm === 'estudiante'
+                                            ? 'Estu'
+                                            : ''));
+                            $badgeClass =
+                                $roleNorm === 'administrador'
+                                    ? 'badge-accent'
+                                    : ($isProfessor
+                                        ? 'badge-secondary'
+                                        : ($roleNorm === 'estudiante'
+                                            ? 'badge-primary'
+                                            : 'badge-ghost'));
+                        @endphp
+                        @if ($badgeText)
+                            <span
+                                class="badge badge-xs {{ $badgeClass }} absolute -bottom-1 -right-1">{{ $badgeText }}</span>
+                        @endif
+                    </div>
                 @else
                     <a href="{{ route('login') }}" class="btn btn-ghost">Iniciar Sesión</a>
                     <a href="{{ route('register') }}" class="btn btn-primary">Registrarse</a>
                 @endauth
             </div>
-
-            <!-- Mobile Menu Button -->
-            <div class="dropdown dropdown-end lg:hidden ml-2">
-                <div tabindex="0" role="button" class="btn btn-ghost btn-circle">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M4 6h16M4 12h16M4 18h16" />
-                    </svg>
-                </div>
-                <ul tabindex="0"
-                    class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
-                    <li><a href="#secundaria">Secundaria</a></li>
-                    <li><a href="#pre-universitario">Pre-Universitario</a></li>
-                    <li><a href="#universitario">Universitario</a></li>
-                    <li><a href="#nosotros">Nosotros</a></li>
-                    <li><a href="#preguntas">Preguntas</a></li>
-                    <div class="divider"></div>
-                    @auth
-                        <li><a href="{{ route('dashboard') }}">Ir a mi Panel</a></li>
-                        <li>
-                            <form method="POST" action="{{ route('logout') }}">
-                                @csrf
-                                <a href="{{ route('logout') }}"
-                                    onclick="event.preventDefault(); this.closest('form').submit();">Cerrar sesión</a>
-                            </form>
-                        </li>
-                    @else
-                        <li><a href="{{ route('login') }}">Iniciar Sesión</a></li>
-                        <li><a href="{{ route('register') }}">Registrarse</a></li>
-                    @endauth
-                </ul>
-            </div>
         </div>
+
+        <!-- Mobile Menu Button -->
+        <div class="dropdown dropdown-end lg:hidden ml-2">
+            <div tabindex="0" role="button" class="btn btn-ghost btn-circle">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            </div>
+            <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
+                <li><a href="#secundaria">Secundaria</a></li>
+                <li><a href="#pre-universitario">Pre-Universitario</a></li>
+                <li><a href="#universitario">Universitario</a></li>
+                <li><a href="#nosotros">Nosotros</a></li>
+                <li><a href="#preguntas">Preguntas</a></li>
+                <div class="divider"></div>
+                @auth
+                    <li><a href="{{ route('dashboard') }}">Ir a mi Panel</a></li>
+                    <li>
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <a href="{{ route('logout') }}"
+                                onclick="event.preventDefault(); this.closest('form').submit();">Cerrar sesión</a>
+                        </form>
+                    </li>
+                @else
+                    <li><a href="{{ route('login') }}">Iniciar Sesión</a></li>
+                    <li><a href="{{ route('register') }}">Registrarse</a></li>
+                @endauth
+            </ul>
+        </div>
+    </div>
     </div>
 
     <main>
@@ -140,38 +173,59 @@
                     </div>
                 </div>
                 <div class="bg-gray-200 rounded-lg shadow-lg h-64 md:h-96 flex items-center justify-center">
-                    <!-- El administrador podrá cambiar este video desde el dashboard -->
-                    <video class="w-full h-full object-cover rounded-lg" controls
-                        poster="https://placehold.co/600x400/e2e8f0/334155?text=Video+Promocional">
-                        <!-- <source src="{{ asset('videos/promo.mp4') }}" type="video/mp4"> -->
-                        Tu navegador no soporta el tag de video.
-                    </video>
+                    @php
+                        $heroImagePath = @file_exists(storage_path('app/branding_hero_image.txt'))
+                            ? trim(file_get_contents(storage_path('app/branding_hero_image.txt')))
+                            : null;
+                        $heroVideoPath = @file_exists(storage_path('app/branding_hero_video.txt'))
+                            ? trim(file_get_contents(storage_path('app/branding_hero_video.txt')))
+                            : null;
+                    @endphp
+                    @if ($heroVideoPath && Storage::disk('public')->exists($heroVideoPath))
+                        <video class="w-full h-full object-cover rounded-lg" autoplay loop muted playsinline
+                            poster="{{ $heroImagePath && Storage::disk('public')->exists($heroImagePath) ? Storage::url($heroImagePath) : '' }}">
+                            <source src="{{ Storage::url($heroVideoPath) }}" type="video/mp4">
+                            Tu navegador no soporta el tag de video.
+                        </video>
+                    @elseif ($heroImagePath && Storage::disk('public')->exists($heroImagePath))
+                        <img src="{{ Storage::url($heroImagePath) }}" alt="Hero"
+                            class="w-full h-full object-cover rounded-lg">
+                    @else
+                        <video class="w-full h-full object-cover rounded-lg" autoplay loop muted playsinline
+                            poster="https://placehold.co/600x400/e2e8f0/334155?text=Video+Promocional">
+                            <source src="https://videos.pexels.com/video-files/856193/856193-hd_1280_720_30fps.mp4"
+                                type="video/mp4">
+                            Tu navegador no soporta el tag de video.
+                        </video>
+                    @endif
                 </div>
             </div>
         </section>
 
         <!-- =========== 2. Logo Marquee =========== -->
         <section class="bg-white py-8 md:py-12">
-            <div class="relative w-full overflow-hidden">
-                <div class="flex animate-scroll">
-                    <div class="flex w-max items-center">
-                        <span class="mx-8 text-lg font-semibold text-gray-500">Biología</span>
-                        <span class="mx-8 text-lg font-semibold text-gray-500">Matemáticas</span>
-                        <span class="mx-8 text-lg font-semibold text-gray-500">Física</span>
-                        <span class="mx-8 text-lg font-semibold text-gray-500">Anatomía</span>
-                        <span class="mx-8 text-lg font-semibold text-gray-500">Fisiología</span>
-                        <span class="mx-8 text-lg font-semibold text-gray-500">Química</span>
-                        <span class="mx-8 text-lg font-semibold text-gray-500">Álgebra</span>
-                        <span class="mx-8 text-lg font-semibold text-gray-500">Histología</span>
-                        <!-- Repetir para efecto infinito -->
-                        <span class="mx-8 text-lg font-semibold text-gray-500">Biología</span>
-                        <span class="mx-8 text-lg font-semibold text-gray-500">Matemáticas</span>
-                        <span class="mx-8 text-lg font-semibold text-gray-500">Física</span>
-                        <span class="mx-8 text-lg font-semibold text-gray-500">Anatomía</span>
-                        <span class="mx-8 text-lg font-semibold text-gray-500">Fisiología</span>
-                        <span class="mx-8 text-lg font-semibold text-gray-500">Química</span>
-                        <span class="mx-8 text-lg font-semibold text-gray-500">Álgebra</span>
-                        <span class="mx-8 text-lg font-semibold text-gray-500">Histología</span>
+            @php $marqueeItems = \App\Models\MarqueeItem::where('active',true)->orderBy('order')->pluck('text'); @endphp
+            <div class="relative w-full overflow-hidden marquee">
+                <div class="flex" aria-hidden="true">
+                    <div class="flex w-max items-center whitespace-nowrap animate-scroll">
+                        @php
+                            $list = $marqueeItems;
+                            if ($list->count() < 6) {
+                                $list = $list->merge($list)->merge($list);
+                            }
+                        @endphp
+                        @foreach ($list as $txt)
+                            <span class="mx-8 text-lg font-semibold text-gray-500">{{ $txt }}</span>
+                        @endforeach
+                        @if ($marqueeItems->isEmpty())
+                            @foreach (['Biología', 'Matemáticas', 'Física', 'Anatomía', 'Fisiología', 'Química', 'Álgebra', 'Histología'] as $txt)
+                                <span class="mx-8 text-lg font-semibold text-gray-400">{{ $txt }}</span>
+                            @endforeach
+                        @endif
+                        <!-- duplicado para scroll infinito -->
+                        @foreach ($list as $txt)
+                            <span class="mx-8 text-lg font-semibold text-gray-500">{{ $txt }}</span>
+                        @endforeach
                     </div>
                 </div>
             </div>
@@ -203,30 +257,31 @@
                             style="-ms-overflow-style: none; scrollbar-width: none;">
                             @foreach ($secundariaCourses as $course)
                                 <div class="flex-shrink-0 w-full sm:w-1/2 md:w-1/3 lg:w-1/4 p-3 snap-start">
-                                    <div
-                                        class="bg-white rounded-lg shadow-lg overflow-hidden transform transition-all duration-300 hover:shadow-2xl hover:scale-105 hover:-translate-y-2 cursor-pointer group">
-                                        @if ($course->image_path && Storage::exists($course->image_path))
-                                            <img src="{{ Storage::url($course->image_path) }}"
-                                                alt="{{ $course->title }}"
-                                                class="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300">
-                                        @else
-                                            <div
-                                                class="w-full h-48 bg-gradient-to-r from-blue-400 to-blue-600 flex items-center justify-center group-hover:from-blue-500 group-hover:to-blue-700 transition-all duration-300">
-                                                <span
-                                                    class="text-white font-bold text-lg group-hover:scale-105 transition-transform duration-300">{{ $course->title }}</span>
+                                    <a href="{{ route('courses.show', $course->id) }}" class="block">
+                                        <div
+                                            class="bg-white rounded-lg shadow-lg overflow-hidden transform transition-all duration-300 hover:shadow-2xl hover:scale-105 hover:-translate-y-2 cursor-pointer group">
+                                            @if ($course->has_image)
+                                                <img src="{{ $course->image_url }}" alt="{{ $course->title }}"
+                                                    class="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300">
+                                            @else
+                                                <div
+                                                    class="w-full h-48 bg-gradient-to-r from-blue-400 to-blue-600 flex items-center justify-center group-hover:from-blue-500 group-hover:to-blue-700 transition-all duration-300">
+                                                    <span
+                                                        class="text-white font-bold text-lg group-hover:scale-105 transition-transform duration-300">{{ $course->title }}</span>
+                                                </div>
+                                            @endif
+                                            <div class="p-5">
+                                                <h3
+                                                    class="font-bold text-lg group-hover:text-blue-600 transition-colors duration-300">
+                                                    {{ $course->title }}</h3>
+                                                <p class="text-gray-600 text-sm mt-1">
+                                                    {{ $course->professor->name ?? 'Profesor' }}</p>
+                                                <div
+                                                    class="mt-4 font-bold text-xl text-blue-600 group-hover:text-blue-700 transition-colors duration-300">
+                                                    ${{ number_format($course->price, 2) }} ARS</div>
                                             </div>
-                                        @endif
-                                        <div class="p-5">
-                                            <h3
-                                                class="font-bold text-lg group-hover:text-blue-600 transition-colors duration-300">
-                                                {{ $course->title }}</h3>
-                                            <p class="text-gray-600 text-sm mt-1">
-                                                {{ $course->professor->name ?? 'Profesor' }}</p>
-                                            <div
-                                                class="mt-4 font-bold text-xl text-blue-600 group-hover:text-blue-700 transition-colors duration-300">
-                                                ${{ number_format($course->price, 2) }} ARS</div>
                                         </div>
-                                    </div>
+                                    </a>
                                 </div>
                             @endforeach
                         </div>
@@ -277,30 +332,31 @@
                             style="-ms-overflow-style: none; scrollbar-width: none;">
                             @foreach ($preUniversitarioCourses as $course)
                                 <div class="flex-shrink-0 w-full sm:w-1/2 md:w-1/3 lg:w-1/4 p-3 snap-start">
-                                    <div
-                                        class="bg-white rounded-lg shadow-lg overflow-hidden transform transition-all duration-300 hover:shadow-2xl hover:scale-105 hover:-translate-y-2 cursor-pointer group">
-                                        @if ($course->image_path && Storage::exists($course->image_path))
-                                            <img src="{{ Storage::url($course->image_path) }}"
-                                                alt="{{ $course->title }}"
-                                                class="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300">
-                                        @else
-                                            <div
-                                                class="w-full h-48 bg-gradient-to-r from-green-400 to-green-600 flex items-center justify-center group-hover:from-green-500 group-hover:to-green-700 transition-all duration-300">
-                                                <span
-                                                    class="text-white font-bold text-lg group-hover:scale-105 transition-transform duration-300">{{ $course->title }}</span>
+                                    <a href="{{ route('courses.show', $course->id) }}" class="block">
+                                        <div
+                                            class="bg-white rounded-lg shadow-lg overflow-hidden transform transition-all duration-300 hover:shadow-2xl hover:scale-105 hover:-translate-y-2 cursor-pointer group">
+                                            @if ($course->has_image)
+                                                <img src="{{ $course->image_url }}" alt="{{ $course->title }}"
+                                                    class="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300">
+                                            @else
+                                                <div
+                                                    class="w-full h-48 bg-gradient-to-r from-green-400 to-green-600 flex items-center justify-center group-hover:from-green-500 group-hover:to-green-700 transition-all duration-300">
+                                                    <span
+                                                        class="text-white font-bold text-lg group-hover:scale-105 transition-transform duration-300">{{ $course->title }}</span>
+                                                </div>
+                                            @endif
+                                            <div class="p-5">
+                                                <h3
+                                                    class="font-bold text-lg group-hover:text-green-600 transition-colors duration-300">
+                                                    {{ $course->title }}</h3>
+                                                <p class="text-gray-600 text-sm mt-1">
+                                                    {{ $course->professor->name ?? 'Profesor' }}</p>
+                                                <div
+                                                    class="mt-4 font-bold text-xl text-blue-600 group-hover:text-green-600 transition-colors duration-300">
+                                                    ${{ number_format($course->price, 2) }} ARS</div>
                                             </div>
-                                        @endif
-                                        <div class="p-5">
-                                            <h3
-                                                class="font-bold text-lg group-hover:text-green-600 transition-colors duration-300">
-                                                {{ $course->title }}</h3>
-                                            <p class="text-gray-600 text-sm mt-1">
-                                                {{ $course->professor->name ?? 'Profesor' }}</p>
-                                            <div
-                                                class="mt-4 font-bold text-xl text-blue-600 group-hover:text-green-600 transition-colors duration-300">
-                                                ${{ number_format($course->price, 2) }} ARS</div>
                                         </div>
-                                    </div>
+                                    </a>
                                 </div>
                             @endforeach
                         </div>
@@ -351,30 +407,31 @@
                             style="-ms-overflow-style: none; scrollbar-width: none;">
                             @foreach ($universitarioCourses as $course)
                                 <div class="flex-shrink-0 w-full sm:w-1/2 md:w-1/3 lg:w-1/4 p-3 snap-start">
-                                    <div
-                                        class="bg-white rounded-lg shadow-lg overflow-hidden transform transition-all duration-300 hover:shadow-2xl hover:scale-105 hover:-translate-y-2 cursor-pointer group">
-                                        @if ($course->image_path && Storage::exists($course->image_path))
-                                            <img src="{{ Storage::url($course->image_path) }}"
-                                                alt="{{ $course->title }}"
-                                                class="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300">
-                                        @else
-                                            <div
-                                                class="w-full h-48 bg-gradient-to-r from-purple-400 to-purple-600 flex items-center justify-center group-hover:from-purple-500 group-hover:to-purple-700 transition-all duration-300">
-                                                <span
-                                                    class="text-white font-bold text-lg group-hover:scale-105 transition-transform duration-300">{{ $course->title }}</span>
+                                    <a href="{{ route('courses.show', $course->id) }}" class="block">
+                                        <div
+                                            class="bg-white rounded-lg shadow-lg overflow-hidden transform transition-all duration-300 hover:shadow-2xl hover:scale-105 hover:-translate-y-2 cursor-pointer group">
+                                            @if ($course->has_image)
+                                                <img src="{{ $course->image_url }}" alt="{{ $course->title }}"
+                                                    class="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300">
+                                            @else
+                                                <div
+                                                    class="w-full h-48 bg-gradient-to-r from-purple-400 to-purple-600 flex items-center justify-center group-hover:from-purple-500 group-hover:to-purple-700 transition-all duration-300">
+                                                    <span
+                                                        class="text-white font-bold text-lg group-hover:scale-105 transition-transform duration-300">{{ $course->title }}</span>
+                                                </div>
+                                            @endif
+                                            <div class="p-5">
+                                                <h3
+                                                    class="font-bold text-lg group-hover:text-purple-600 transition-colors duration-300">
+                                                    {{ $course->title }}</h3>
+                                                <p class="text-gray-600 text-sm mt-1">
+                                                    {{ $course->professor->name ?? 'Profesor' }}</p>
+                                                <div
+                                                    class="mt-4 font-bold text-xl text-blue-600 group-hover:text-purple-600 transition-colors duration-300">
+                                                    ${{ number_format($course->price, 2) }} ARS</div>
                                             </div>
-                                        @endif
-                                        <div class="p-5">
-                                            <h3
-                                                class="font-bold text-lg group-hover:text-purple-600 transition-colors duration-300">
-                                                {{ $course->title }}</h3>
-                                            <p class="text-gray-600 text-sm mt-1">
-                                                {{ $course->professor->name ?? 'Profesor' }}</p>
-                                            <div
-                                                class="mt-4 font-bold text-xl text-blue-600 group-hover:text-purple-600 transition-colors duration-300">
-                                                ${{ number_format($course->price, 2) }} ARS</div>
                                         </div>
-                                    </div>
+                                    </a>
                                 </div>
                             @endforeach
                         </div>
@@ -410,51 +467,90 @@
                 <p class="text-gray-600 mt-2 max-w-2xl mx-auto">Combinamos tecnología, pedagogía y la experiencia de
                     los mejores profesores para ofrecerte una experiencia de aprendizaje única.</p>
             </div>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div class="grid gap-4">
-                    <div>
-                        <img class="h-auto max-w-full rounded-lg shadow-md"
-                            src="https://placehold.co/500x700/a5b4fc/312e81?text=Estudiante+Concentrado"
-                            alt="">
-                    </div>
-                    <div>
-                        <img class="h-auto max-w-full rounded-lg shadow-md"
-                            src="https://placehold.co/500x500/818cf8/1e1b4b?text=Clase+Virtual" alt="">
-                    </div>
-                </div>
-                <div class="grid gap-4">
-                    <div>
-                        <img class="h-auto max-w-full rounded-lg shadow-md"
-                            src="https://placehold.co/500x500/6366f1/eef2ff?text=Material+de+Estudio" alt="">
-                    </div>
-                    <div>
-                        <img class="h-auto max-w-full rounded-lg shadow-md"
-                            src="https://placehold.co/500x700/4f46e5/e0e7ff?text=Profesor+Explicando" alt="">
-                    </div>
-                </div>
-                <div class="grid gap-4">
-                    <div>
-                        <img class="h-auto max-w-full rounded-lg shadow-md"
-                            src="https://placehold.co/500x700/6d28d9/f5f3ff?text=Trabajo+en+Equipo" alt="">
-                    </div>
-                    <div>
-                        <img class="h-auto max-w-full rounded-lg shadow-md"
-                            src="https://placehold.co/500x500/7c3aed/f5f3ff?text=Éxito+Académico" alt="">
-                    </div>
-                </div>
-                <div class="grid gap-4">
-                    <div>
-                        <img class="h-auto max-w-full rounded-lg shadow-md"
-                            src="https://placehold.co/500x500/9333ea/faf5ff?text=Plataforma+Intuitiva" alt="">
-                    </div>
-                    <div>
-                        <img class="h-auto max-w-full rounded-lg shadow-md"
-                            src="https://placehold.co/500x700/a855f7/faf5ff?text=Graduación" alt="">
-                    </div>
-                </div>
+            @php
+                $grid = \App\Models\HomeGridItem::orderBy('order')->get()->keyBy('order');
+                $placeholders = [
+                    1 => ['Foco', '6366f1'],
+                    2 => ['Resumen', '818cf8'],
+                    3 => ['Estudio', '4f46e5'],
+                    4 => ['Docencia', '4338ca'],
+                    5 => ['Trabajo', '6d28d9'],
+                    6 => ['Práctica', '7c3aed'],
+                    7 => ['Colaboración', '9333ea'],
+                    8 => ['Innovación', 'a855f7'],
+                    9 => ['Meta', 'b779ff'],
+                    10 => ['Logro', 'c084fc'],
+                ];
+                function cell($slot, $grid, $placeholders)
+                {
+                    $item = $grid->get($slot);
+                    if ($item) {
+                        $media =
+                            $item->media_type === 'image'
+                                ? '<img class="w-full h-full object-cover rounded-lg" src="' .
+                                    $item->url .
+                                    '" alt="' .
+                                    e($item->title) .
+                                    '" />'
+                                : '<video class="w-full h-full object-cover rounded-lg" autoplay loop muted playsinline><source src="' .
+                                    $item->url .
+                                    '" type="video/mp4" /></video>';
+                        $overlay = $item->title
+                            ? '<div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center p-2 text-white text-sm font-medium text-center">' .
+                                e($item->title) .
+                                '</div>'
+                            : '';
+                        return '<div class="relative group w-full h-full">' . $media . $overlay . '</div>';
+                    }
+                    [$t, $bg] = $placeholders[$slot];
+                    return '<div class="w-full h-full rounded-lg flex items-center justify-center text-white text-xs font-semibold" style="background:#' .
+                        $bg .
+                        '">' .
+                        $t .
+                        '</div>';
+                }
+            @endphp
+            <div class="parent grid gap-2 md:gap-2"
+                style="grid-template-columns:repeat(5,minmax(0,1fr));grid-template-rows:repeat(6,120px);">
+                <div class="div1 row-span-4 col-span-1">{!! cell(1, $grid, $placeholders) !!}</div>
+                <div class="div2 row-span-2 col-span-1 row-start-5">{!! cell(2, $grid, $placeholders) !!}</div>
+                <div class="div3 row-span-2 col-span-1 col-start-2 row-start-1">{!! cell(3, $grid, $placeholders) !!}</div>
+                <div class="div4 row-span-4 col-span-1 col-start-2 row-start-3">{!! cell(4, $grid, $placeholders) !!}</div>
+                <div class="div5 row-span-2 col-span-1 col-start-3 row-start-1">{!! cell(5, $grid, $placeholders) !!}</div>
+                <div class="div6 row-span-2 col-span-1 col-start-3 row-start-3">{!! cell(6, $grid, $placeholders) !!}</div>
+                <div class="div7 row-span-2 col-span-2 col-start-3 row-start-5">{!! cell(7, $grid, $placeholders) !!}</div>
+                <div class="div8 row-span-4 col-span-1 col-start-4 row-start-1">{!! cell(8, $grid, $placeholders) !!}</div>
+                <div class="div9 row-span-2 col-span-1 col-start-5 row-start-1">{!! cell(9, $grid, $placeholders) !!}</div>
+                <div class="div10 row-span-4 col-span-1 col-start-5 row-start-3">{!! cell(10, $grid, $placeholders) !!}</div>
             </div>
         </section>
     </main>
+
+    <style>
+        @media (max-width: 1024px) {
+            .parent {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                grid-template-rows: repeat(10, 120px) !important;
+            }
+
+            .parent>div {
+                grid-column: auto !important;
+                grid-row: span 2 / span 2 !important;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .parent {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                grid-template-rows: repeat(15, 110px) !important;
+            }
+
+            .parent>div {
+                grid-column: auto !important;
+                grid-row: span 2 / span 2 !important;
+            }
+        }
+    </style>
 
     <!-- =========== Footer =========== -->
     <footer class="bg-gray-800 text-white">

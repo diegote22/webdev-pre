@@ -1,6 +1,6 @@
 @if (isset($course))
     <form method="POST" action="{{ route('courses.customize.save', $course) }}" enctype="multipart/form-data"
-        class="space-y-6" x-data="coverForm({ initial: @js(!empty($course->image_path) ? Storage::url($course->image_path) : null) })">
+        class="space-y-6" x-data="coverForm({ initial: @js($course->has_image ? $course->image_url : null) })">
         @csrf
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
             <div class="lg:col-span-2 space-y-6">

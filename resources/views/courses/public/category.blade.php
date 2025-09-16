@@ -112,8 +112,8 @@
                         <div
                             class="card bg-base-100 shadow-lg hover:shadow-2xl transform transition-all duration-300 hover:scale-105 hover:-translate-y-2 cursor-pointer group">
                             <figure>
-                                @if ($course->image_path && Storage::exists($course->image_path))
-                                    <img src="{{ Storage::url($course->image_path) }}" alt="{{ $course->title }}"
+                                @if ($course->has_image)
+                                    <img src="{{ $course->image_url }}" alt="{{ $course->title }}"
                                         class="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300">
                                 @else
                                     <div

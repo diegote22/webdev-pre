@@ -1,45 +1,74 @@
 <x-instructor-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">Mis cursos</h2>
+        <div class="flex items-center justify-between">
+            <h2 class="font-semibold text-xl">Mis cursos</h2>
+            <a href="{{ route('instructor.courses.create') }}" class="btn btn-primary">+ Nuevo curso</a>
+        </div>
     </x-slot>
 
     <x-container class="py-8">
-        <div class="bg-white rounded-lg shadow p-6">
-            <div class="flex justify-end mb-4">
-                <a href="{{ route('instructor.courses.create') }}"
-                    class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">Nuevo
-                    curso</a>
+        <div class="card bg-base-100 shadow">
+            <div class="card-body">
+                <div class="tabs tabs-boxed w-full overflow-x-auto">
+                    @php(
+    $statuses = [
+        null => 'Todos',
+        'published' => 'Publicados',
+        'under_review' => 'En revisión',
+        'pending' => 'Borradores',
+        'rejected' => 'Rechazados',
+        'unpublished' => 'No listados',
+    ],
+)
+                    @foreach ($statuses as $key => $label)
+                        <a class="tab {{ ($status ?? null) == $key ? 'tab-active' : '' }}"
+                            href="{{ $key ? route('instructor.courses.index', ['status' => $key]) : route('instructor.courses.index') }}">{{ $label }}</a>
+                    @endforeach
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="table table-zebra">
+                        <thead>
+                            <tr>
+                                <th>Título</th>
+                                <th class="hidden md:table-cell">Estado</th>
+                                <th class="hidden md:table-cell">Categoría</th>
+                                <th class="hidden md:table-cell">Nivel</th>
+                                <th>Precio</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @php($badgeMap = ['published' => 'success', 'under_review' => 'warning', 'pending' => 'info', 'rejected' => 'error', 'unpublished' => 'neutral'])
+                            @forelse($courses as $course)
+                                <tr>
+                                    <td class="font-medium">{{ $course->title }}</td>
+                                    <td class="hidden md:table-cell">
+                                        <span class="badge badge-{{ $badgeMap[$course->status] ?? 'neutral' }}">
+                                            {{ str_replace('_', ' ', $course->status ?? '—') }}
+                                        </span>
+                                    </td>
+                                    <td class="hidden md:table-cell">{{ $course->category?->name ?? '—' }}</td>
+                                    <td class="hidden md:table-cell">{{ $course->level ?? '—' }}</td>
+                                    <td>{{ $course->price ? '$ ' . number_format($course->price, 2) : 'Gratis' }}</td>
+                                    <td class="text-right">
+                                        <div class="join">
+                                            <a href="{{ route('instructor.courses.edit', $course) }}"
+                                                class="btn btn-sm join-item">Editar</a>
+                                            <a href="{{ route('courses.wizard', $course) }}"
+                                                class="btn btn-sm btn-ghost join-item">Asistente</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="6" class="text-center opacity-70 py-8">No tienes cursos aún.</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
             </div>
-            <table class="w-full text-sm">
-                <thead>
-                    <tr class="text-left border-b">
-                        <th class="py-2 pr-4">Título</th>
-                        <th class="py-2 pr-4">Categoría</th>
-                        <th class="py-2 pr-4">Nivel</th>
-                        <th class="py-2 pr-4">Precio</th>
-                        <th class="py-2 pr-4">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($courses as $course)
-                        <tr class="border-b">
-                            <td class="py-2 pr-4">{{ $course->title }}</td>
-                            <td class="py-2 pr-4">{{ $course->category?->name ?? '-' }}</td>
-                            <td class="py-2 pr-4">{{ $course->level ?? '-' }}</td>
-                            <td class="py-2 pr-4">
-                                {{ $course->price ? '$ ' . number_format($course->price, 2) : 'Gratis' }}</td>
-                            <td class="py-2 pr-4 space-x-2">
-                                <a href="{{ route('instructor.courses.edit', $course) }}"
-                                    class="text-indigo-600 hover:underline">Editar</a>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td class="py-4 text-center text-gray-500" colspan="5">No tienes cursos aún.</td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
         </div>
     </x-container>
 </x-instructor-layout>

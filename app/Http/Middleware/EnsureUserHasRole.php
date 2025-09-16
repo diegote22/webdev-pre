@@ -16,9 +16,12 @@ class EnsureUserHasRole
     public function handle(Request $request, Closure $next, string $roleName): Response
     {
         $user = $request->user();
-        if (!$user || !$user->role || strcasecmp($user->role->name, $roleName) !== 0) {
-            abort(403);
-        }
+        // Permitir lista de roles separados por coma: role:Profesor,Administrador
+        $allowed = array_map('trim', explode(',', $roleName));
+        $hasRole = $user && $user->role && collect($allowed)->contains(function ($r) use ($user) {
+            return strcasecmp($user->role->name, $r) === 0;
+        });
+        if (!$hasRole) abort(403);
         return $next($request);
     }
 }

@@ -1,0 +1,37 @@
+[
+    {
+        "id": 1,
+        "title": "\u00c1lgebra y Funciones",
+        "image_path": null,
+        "has_image": false,
+        "image_url": null
+    },
+    {
+        "id": 2,
+        "title": "Geometr\u00eda y Trigonometr\u00eda",
+        "image_path": null,
+        "has_image": false,
+        "image_url": null
+    },
+    {
+        "id": 3,
+        "title": "Mec\u00e1nica B\u00e1sica",
+        "image_path": null,
+        "has_image": false,
+        "image_url": null
+    },
+    {
+        "id": 4,
+        "title": "Biolog\u00eda Celular",
+        "image_path": "courses/0SXaIVT7LxMinYd4pcVRqK3SUfQLuWIZqnft3WF1.jpg",
+        "has_image": true,
+        "image_url": "http://localhost/Laravel/WebDev-Pre/public/storage/courses/0SXaIVT7LxMinYd4pcVRqK3SUfQLuWIZqnft3WF1.jpg"
+    },
+    {
+        "id": 5,
+        "title": "Anatom\u00eda Humana I",
+        "image_path": null,
+        "has_image": false,
+        "image_url": null
+    }
+]

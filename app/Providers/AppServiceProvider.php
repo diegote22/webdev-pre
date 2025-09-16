@@ -25,13 +25,20 @@ class AppServiceProvider extends ServiceProvider
         // Comparte el conteo de mensajes no leídos con todas las vistas (simulado)
         View::composer('*', function ($view) {
             $unread = 0;
-
             if (Auth::check()) {
-                // Obtén el conteo desde sesión si existe
-                $unread = Session::get('student.unread_messages');
+                // Intentar usar la nueva clave global; si no existe, caer a la anterior y migrarla
+                $unread = Session::get('unread_messages');
+                if ($unread === null) {
+                    $legacy = Session::get('student.unread_messages');
+                    if ($legacy !== null) {
+                        $unread = $legacy;
+                        Session::put('unread_messages', $unread);
+                        Session::forget('student.unread_messages');
+                    }
+                }
 
                 if ($unread === null) {
-                    // Valor por defecto basado en los mensajes simulados
+                    // Simulación inicial de mensajes (compartida para cualquier rol)
                     $messages = collect([
                         (object) [
                             'id' => 1,
@@ -61,13 +68,11 @@ class AppServiceProvider extends ServiceProvider
                             'avatar' => null,
                         ],
                     ]);
-
                     $unread = $messages->where('read', false)->count();
-                    Session::put('student.unread_messages', $unread);
+                    Session::put('unread_messages', $unread);
                 }
             }
-
-            $view->with('unreadMessagesCount', (int) $unread);
+            $view->with('unreadMessagesCount', (int) ($unread ?? 0));
         });
     }
 }

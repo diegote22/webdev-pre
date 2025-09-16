@@ -10,17 +10,6 @@
                 <p class="text-indigo-100 mt-1">Actualiza los detalles de tu curso</p>
             </div>
             <div class="p-6">
-                @if (session('flash.banner'))
-                    <div
-                        class="mb-6 p-4 rounded-lg bg-green-50 text-green-700 border border-green-200 flex items-center">
-                        <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd"
-                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                clip-rule="evenodd"></path>
-                        </svg>
-                        {{ session('flash.banner') }}
-                    </div>
-                @endif
 
                 <form action="{{ route('instructor.courses.update', $course) }}" method="POST"
                     enctype="multipart/form-data" x-data="courseEditForm()">
@@ -131,7 +120,7 @@
                                 </div>
                                 <div class="mt-6 flex justify-center">
                                     <img x-ref="preview"
-                                        src="{{ $course->image_path ? \Illuminate\Support\Facades\Storage::url($course->image_path) : 'https://placehold.co/400x225?text=Previsualización' }}"
+                                        src="{{ $course->has_image ? $course->image_url : 'https://placehold.co/400x225?text=Previsualización' }}"
                                         alt="Preview" class="w-full max-w-sm rounded-lg shadow-md border" />
                                 </div>
                             </div>

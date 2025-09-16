@@ -16,8 +16,19 @@ class CourseController extends Controller
     public function index()
     {
         $userId = Auth::id();
-        $courses = Course::where('user_id', $userId)->latest('id')->get();
-        return view('instructor.courses.index', compact('courses'));
+        $query = Course::where('user_id', $userId)->latest('id');
+
+        // Filtro opcional por estado ?status=published|pending|under_review|rejected|unpublished
+        $status = request('status');
+        if ($status) {
+            $allowed = ['published', 'pending', 'under_review', 'rejected', 'unpublished'];
+            if (in_array($status, $allowed, true)) {
+                $query->where('status', $status);
+            }
+        }
+
+        $courses = $query->get();
+        return view('instructor.courses.index', compact('courses', 'status'));
     }
 
     public function create()
@@ -88,7 +99,7 @@ class CourseController extends Controller
 
         $course->update($data);
 
-        session()->flash('flash.banner', 'El curso se actualizó con éxito');
+        session()->flash('success', 'El curso se actualizó con éxito');
         return redirect()->route('instructor.courses.edit', $course);
     }
 

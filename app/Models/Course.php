@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 use App\Models\User;
 use App\Models\Category;
 use App\Models\SubCategory;
@@ -19,6 +20,7 @@ class Course extends Model
         'slug',
         'description',
         'price',
+        'status',
         'summary',
         'image_path',
         'promo_video_url',
@@ -53,5 +55,49 @@ class Course extends Model
     public function sections()
     {
         return $this->hasMany(Section::class)->orderBy('position');
+    }
+
+    // Estados posibles: pending, under_review, published, rejected, unpublished
+    public function scopePublished($query)
+    {
+        return $query->where('status', 'published');
+    }
+
+    public function scopePending($query)
+    {
+        return $query->where('status', 'pending');
+    }
+
+    public function scopeUnderReview($query)
+    {
+        return $query->where('status', 'under_review');
+    }
+
+    public function scopeRejected($query)
+    {
+        return $query->where('status', 'rejected');
+    }
+
+    public function scopeUnpublished($query)
+    {
+        return $query->where('status', 'unpublished');
+    }
+
+    // Alumnos inscritos
+    public function students()
+    {
+        return $this->belongsToMany(User::class, 'enrollments')->withTimestamps();
+    }
+
+    // Helpers de imagen en disco público
+    public function getImageUrlAttribute(): ?string
+    {
+        if (!$this->image_path) return null;
+        return Storage::disk('public')->url($this->image_path);
+    }
+
+    public function getHasImageAttribute(): bool
+    {
+        return $this->image_path ? Storage::disk('public')->exists($this->image_path) : false;
     }
 }

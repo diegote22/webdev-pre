@@ -218,6 +218,21 @@ class CourseController extends Controller
         return back()->with(['status' => 'Meta eliminada', 'activeTab' => 'goals']);
     }
 
+    // ---------- Publicación ----------
+    public function publish(Request $request, Course $course): RedirectResponse
+    {
+        $this->authorizeOwner($course);
+        $course->update(['status' => 'published']);
+        return back()->with('status', 'Curso publicado');
+    }
+
+    public function unpublish(Request $request, Course $course): RedirectResponse
+    {
+        $this->authorizeOwner($course);
+        $course->update(['status' => 'unpublished']);
+        return back()->with('status', 'Curso ocultado');
+    }
+
     // Requirements
     public function storeRequirement(Request $request, Course $course): RedirectResponse
     {
@@ -315,6 +330,10 @@ class CourseController extends Controller
             'thumbnail' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
             'is_published' => ['nullable', 'boolean'],
             'is_preview' => ['nullable', 'boolean'],
+            'access' => ['nullable', 'in:public,free'],
+            'attachment_online' => ['nullable', 'file', 'mimes:pdf', 'max:30720'], // 30MB
+            'attachments_download' => ['nullable', 'array', 'max:3'],
+            'attachments_download.*' => ['file', 'mimes:pdf', 'max:30720'],
         ]);
 
         $video_url = null;
@@ -332,16 +351,52 @@ class CourseController extends Controller
         }
 
         $pos = ($section->lessons()->max('position') ?? 0) + 1;
-        $section->lessons()->create([
+        $lesson = $section->lessons()->create([
             'title' => $data['title'],
             'description' => $data['description'] ?? null,
             'video_type' => $data['video_type'] ?? null,
             'video_url' => $video_url,
             'thumbnail_path' => $thumb,
             'is_published' => (bool)($data['is_published'] ?? false),
-            'is_preview' => (bool)($data['is_preview'] ?? false),
+            'is_preview' => (bool)($data['is_preview'] ?? false) || (($data['access'] ?? 'public') === 'free'),
             'position' => $pos,
         ]);
+
+        // Adjuntos PDF: 1 online máximo
+        if ($request->hasFile('attachment_online')) {
+            // Borrar online existentes si ya hay más de 0
+            $existingOnline = $lesson->attachments()->where('kind', 'online')->count();
+            if ($existingOnline >= 1) {
+                // opcional: podríamos rechazar; por ahora reemplazamos el anterior
+                $lesson->attachments()->where('kind', 'online')->delete();
+            }
+            $file = $request->file('attachment_online');
+            $stored = $file->store('courses/lessons/attachments', 'public');
+            $lesson->attachments()->create([
+                'path' => $stored,
+                'name' => $file->getClientOriginalName(),
+                'size' => $file->getSize(),
+                'mime' => $file->getMimeType(),
+                'kind' => 'online',
+            ]);
+        }
+
+        // Adjuntos PDF: hasta 3 descarga
+        if (!empty($data['attachments_download'])) {
+            $existingDownload = $lesson->attachments()->where('kind', 'download')->count();
+            $remaining = max(0, 3 - $existingDownload);
+            $toProcess = array_slice($request->file('attachments_download') ?? [], 0, $remaining);
+            foreach ($toProcess as $file) {
+                $stored = $file->store('courses/lessons/attachments', 'public');
+                $lesson->attachments()->create([
+                    'path' => $stored,
+                    'name' => $file->getClientOriginalName(),
+                    'size' => $file->getSize(),
+                    'mime' => $file->getMimeType(),
+                    'kind' => 'download',
+                ]);
+            }
+        }
 
         return back()->with(['status' => 'Lección agregada', 'activeTab' => 'sections']);
     }
@@ -359,6 +414,10 @@ class CourseController extends Controller
             'thumbnail' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
             'is_published' => ['nullable', 'boolean'],
             'is_preview' => ['nullable', 'boolean'],
+            'access' => ['nullable', 'in:public,free'],
+            'attachment_online' => ['nullable', 'file', 'mimes:pdf', 'max:30720'],
+            'attachments_download' => ['nullable', 'array', 'max:3'],
+            'attachments_download.*' => ['file', 'mimes:pdf', 'max:30720'],
         ]);
 
         $update = [
@@ -366,7 +425,7 @@ class CourseController extends Controller
             'description' => $data['description'] ?? null,
             'video_type' => $data['video_type'] ?? null,
             'is_published' => (bool)($data['is_published'] ?? false),
-            'is_preview' => (bool)($data['is_preview'] ?? false),
+            'is_preview' => (bool)($data['is_preview'] ?? false) || (($data['access'] ?? 'public') === 'free'),
         ];
 
         if (($data['video_type'] ?? null) === 'youtube' && !empty($data['youtube_url'])) {
@@ -382,6 +441,36 @@ class CourseController extends Controller
         }
 
         $lesson->update($update);
+
+        // Adjuntos PDF: reemplazo del online si llega uno
+        if ($request->hasFile('attachment_online')) {
+            $lesson->attachments()->where('kind', 'online')->delete();
+            $file = $request->file('attachment_online');
+            $stored = $file->store('courses/lessons/attachments', 'public');
+            $lesson->attachments()->create([
+                'path' => $stored,
+                'name' => $file->getClientOriginalName(),
+                'size' => $file->getSize(),
+                'mime' => $file->getMimeType(),
+                'kind' => 'online',
+            ]);
+        }
+
+        if (!empty($data['attachments_download'])) {
+            $existingDownload = $lesson->attachments()->where('kind', 'download')->count();
+            $remaining = max(0, 3 - $existingDownload);
+            $toProcess = array_slice($request->file('attachments_download') ?? [], 0, $remaining);
+            foreach ($toProcess as $file) {
+                $stored = $file->store('courses/lessons/attachments', 'public');
+                $lesson->attachments()->create([
+                    'path' => $stored,
+                    'name' => $file->getClientOriginalName(),
+                    'size' => $file->getSize(),
+                    'mime' => $file->getMimeType(),
+                    'kind' => 'download',
+                ]);
+            }
+        }
         return back()->with(['status' => 'Lección actualizada', 'activeTab' => 'sections']);
     }
 
@@ -433,8 +522,8 @@ class CourseController extends Controller
     // Métodos públicos para mostrar cursos por categoría
     public function secundaria(): View
     {
-        $courses = Course::whereHas('category', function ($query) {
-            $query->where('name', 'LIKE', '%Secundaria%');
+        $courses = Course::published()->whereHas('category', function ($query) {
+            $query->where('slug', 'secundaria');
         })->with(['category', 'subCategory', 'professor'])->paginate(12);
 
         return view('courses.public.category', [
@@ -446,8 +535,8 @@ class CourseController extends Controller
 
     public function preUniversitario(): View
     {
-        $courses = Course::whereHas('category', function ($query) {
-            $query->where('name', 'LIKE', '%Pre-Universitario%');
+        $courses = Course::published()->whereHas('category', function ($query) {
+            $query->where('slug', 'pre-universitario');
         })->with(['category', 'subCategory', 'professor'])->paginate(12);
 
         return view('courses.public.category', [
@@ -459,8 +548,8 @@ class CourseController extends Controller
 
     public function universitario(): View
     {
-        $courses = Course::whereHas('category', function ($query) {
-            $query->where('name', 'LIKE', '%Universitario%');
+        $courses = Course::published()->whereHas('category', function ($query) {
+            $query->where('slug', 'universitario');
         })->with(['category', 'subCategory', 'professor'])->paginate(12);
 
         return view('courses.public.category', [
@@ -473,6 +562,11 @@ class CourseController extends Controller
     // Método público para mostrar el detalle de un curso
     public function show(Course $course): View
     {
+        // Mostrar solo si está publicado
+        if ($course->status !== 'published') {
+            abort(404);
+        }
+
         $course->load([
             'category',
             'subCategory',
@@ -492,7 +586,7 @@ class CourseController extends Controller
     {
         $q = trim((string) $request->get('q', ''));
 
-        $courses = Course::query()
+        $courses = Course::query()->published()
             ->with(['category', 'subCategory', 'professor'])
             ->when($q !== '', function ($query) use ($q) {
                 $query->where(function ($sub) use ($q) {

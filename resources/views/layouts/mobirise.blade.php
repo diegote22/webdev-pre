@@ -49,6 +49,9 @@
                             class="px-4 py-2 text-sm font-medium text-gray-700 bg-white rounded-lg border border-gray-200 hover:bg-gray-100">Cerrar
                             sesión</button>
                     </form>
+                    <div
+                        class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-semibold">
+                        P</div>
                 @else
                     <a href="{{ route('login') }}"
                         class="px-4 py-2 text-sm font-medium text-gray-700 bg-white rounded-lg border border-gray-200 hover:bg-gray-100">Iniciar

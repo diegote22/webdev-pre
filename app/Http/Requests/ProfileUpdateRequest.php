@@ -41,7 +41,7 @@ class ProfileUpdateRequest extends FormRequest
             'youtube' => ['nullable', 'string', 'max:100'],
         ];
     }
-    
+
     /**
      * Prepare the data for validation.
      */

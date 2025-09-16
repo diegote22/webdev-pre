@@ -11,9 +11,11 @@
 |
 */
 
-pest()->extend(Tests\TestCase::class)
-    ->use(Illuminate\Foundation\Testing\RefreshDatabase::class)
-    ->in('Feature');
+use Tests\TestCase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+
+// Asegura que los tests de Feature usen la TestCase de Laravel y refresquen la base de datos
+uses(TestCase::class, RefreshDatabase::class)->in('Feature');
 
 /*
 |--------------------------------------------------------------------------

@@ -11,7 +11,8 @@ class LessonAttachment extends Model
         'path',
         'name',
         'size',
-        'mime'
+        'mime',
+        'kind',
     ];
 
     public function lesson()

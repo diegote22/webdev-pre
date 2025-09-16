@@ -5,75 +5,65 @@
         </h2>
     </x-slot>
 
-    <div class="py-6" x-data="{ step: '{{ request('tab', session('activeTab', 'general')) }}' }">
+    <div class="py-6" x-data="{
+        step: '{{ request('tab', session('activeTab', 'general')) }}',
+        order: { general: 1, customize: 2, promo: 3, goals: 4, requirements: 5, sections: 6 },
+        stepsArr: ['general', 'customize', 'promo', 'goals', 'requirements', 'sections']
+    }">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <!-- Tabs superiores (móvil/tablet) -->
-            <div class="md:hidden mb-4">
-                <div class="tabs tabs-boxed w-full">
-                    <button @click="step='general'" :class="step === 'general' ? 'tab tab-active' : 'tab'">General</button>
-                    <button @click="step='customize'"
-                        :class="step === 'customize' ? 'tab tab-active' : 'tab'">Personalizar</button>
-                    <button @click="step='promo'" :class="step === 'promo' ? 'tab tab-active' : 'tab'">Promo</button>
-                    <button @click="step='goals'" :class="step === 'goals' ? 'tab tab-active' : 'tab'">Metas</button>
-                    <button @click="step='requirements'"
-                        :class="step === 'requirements' ? 'tab tab-active' : 'tab'">Requisitos</button>
-                    <button @click="step='sections'"
-                        :class="step === 'sections' ? 'tab tab-active' : 'tab'">Secciones</button>
-                </div>
+            <!-- Steps responsive arriba -->
+            <div class="mb-6">
+                <ul class="steps steps-vertical lg:steps-horizontal w-full">
+                    <li class="step cursor-pointer" @click="step='general'"
+                        :class="order[step] >= 1 ? 'step-primary' : ''">Datos generales</li>
+                    <li class="step cursor-pointer" @click="step='customize'"
+                        :class="order[step] >= 2 ? 'step-primary' : ''">Personalizar</li>
+                    <li class="step cursor-pointer" @click="step='promo'"
+                        :class="order[step] >= 3 ? 'step-primary' : ''">Video promo</li>
+                    <li class="step cursor-pointer" @click="step='goals'"
+                        :class="order[step] >= 4 ? 'step-primary' : ''">Metas</li>
+                    <li class="step cursor-pointer" @click="step='requirements'"
+                        :class="order[step] >= 5 ? 'step-primary' : ''">Requisitos</li>
+                    <li class="step cursor-pointer" @click="step='sections'"
+                        :class="order[step] >= 6 ? 'step-primary' : ''">Secciones</li>
+                </ul>
             </div>
 
-            <div class="grid grid-cols-12 gap-6">
-                <!-- Aside de pestañas verticales -->
-                <aside class="col-span-12 lg:col-span-3 hidden md:block">
-                    <nav class="sticky top-4">
-                        <div class="tabs tabs-lifted tabs-vertical w-full">
-                            <button @click="step='general'" :class="step === 'general' ? 'tab tab-active' : 'tab'">Datos
-                                generales</button>
-                            <button @click="step='customize'"
-                                :class="step === 'customize' ? 'tab tab-active' : 'tab'">Personalizar curso</button>
-                            <button @click="step='promo'" :class="step === 'promo' ? 'tab tab-active' : 'tab'">Video
-                                promocional</button>
-                            <div class="mt-2 px-3 text-xs text-base-content/60">Contenido</div>
-                            <button @click="step='goals'" :class="step === 'goals' ? 'tab tab-active' : 'tab'">Metas del
-                                curso</button>
-                            <button @click="step='requirements'"
-                                :class="step === 'requirements' ? 'tab tab-active' : 'tab'">Requisitos del curso</button>
-                            <button @click="step='sections'"
-                                :class="step === 'sections' ? 'tab tab-active' : 'tab'">Secciones del curso</button>
+            <!-- Panel de contenido: muestra una sola sección por vez -->
+            <section class="">
+                <div class="bg-base-100 overflow-hidden shadow-sm sm:rounded-lg">
+                    <div class="p-6 text-base-content">
+                        {{-- Mensajes de estado se muestran mediante toast global en el layout --}}
+                        <div x-show="step==='general'">
+                            @include('courses.partials.general')
                         </div>
-                    </nav>
-                </aside>
-
-                <!-- Panel de contenido: muestra una sola sección por vez -->
-                <section class="col-span-12 lg:col-span-9">
-                    <div class="bg-base-100 overflow-hidden shadow-sm sm:rounded-lg">
-                        <div class="p-6 text-base-content">
-                            @if (session('status'))
-                                <div class="alert alert-success mb-4">
-                                    {{ session('status') }}
-                                </div>
-                            @endif
-                            <div x-show="step==='general'">
-                                @include('courses.partials.general')
-                            </div>
-                            <div x-show="step==='customize'" x-cloak>
-                                @include('courses.partials.customize')
-                            </div>
-                            <div x-show="step==='promo'" x-cloak>
-                                @include('courses.partials.promo')
-                            </div>
-                            <div x-show="step==='goals'" x-cloak>
-                                @include('courses.partials.goals')
-                            </div>
-                            <div x-show="step==='requirements'" x-cloak>
-                                @include('courses.partials.requirements')
-                            </div>
-                            <div x-show="step==='sections'" x-cloak>
-                                @include('courses.partials.sections')
-                            </div>
+                        <div x-show="step==='customize'" x-cloak>
+                            @include('courses.partials.customize')
+                        </div>
+                        <div x-show="step==='promo'" x-cloak>
+                            @include('courses.partials.promo')
+                        </div>
+                        <div x-show="step==='goals'" x-cloak>
+                            @include('courses.partials.goals')
+                        </div>
+                        <div x-show="step==='requirements'" x-cloak>
+                            @include('courses.partials.requirements')
+                        </div>
+                        <div x-show="step==='sections'" x-cloak>
+                            @include('courses.partials.sections')
                         </div>
                     </div>
-                </section>
+                </div>
+            </section>
+
+            <!-- Barra pegajosa de navegación -->
+            <div class="fixed bottom-6 right-6 z-40">
+                <div class="btn-group shadow-xl">
+                    <button class="btn" @click="step = stepsArr[Math.max(order[step]-2, 0)]"
+                        :disabled="order[step] === 1">Anterior</button>
+                    <button class="btn btn-primary" @click="step = stepsArr[Math.min(order[step], stepsArr.length-1)]"
+                        :disabled="order[step] === stepsArr.length">Siguiente</button>
+                </div>
             </div>
         </div>
     </div>

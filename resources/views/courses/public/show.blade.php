@@ -29,8 +29,8 @@
 
                         <!-- Video/Imagen Principal -->
                         <div class="relative mb-6">
-                            @if ($course->image_path && Storage::exists($course->image_path))
-                                <img src="{{ Storage::url($course->image_path) }}" alt="{{ $course->title }}"
+                            @if ($course->has_image)
+                                <img src="{{ $course->image_url }}" alt="{{ $course->title }}"
                                     class="w-full h-64 object-cover rounded-lg">
                             @else
                                 <div

@@ -19,9 +19,7 @@
             <div class="flex justify-end mb-4">
                 <a href="{{ route('courses.create') }}" class="btn btn-primary">Nuevo curso</a>
             </div>
-            @if (session('status'))
-                <div class="mb-4 p-3 bg-green-100 text-green-700 rounded">{{ session('status') }}</div>
-            @endif
+            {{-- Mensaje movido arriba para evitar duplicados --}}
             <div class="bg-base-100 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-base-content">
                     @if ($courses->count())
@@ -29,9 +27,9 @@
                             @foreach ($courses as $course)
                                 <div class="card bg-base-100 w-full shadow-sm">
                                     <figure>
-                                        @if ($course->image_path && Storage::exists($course->image_path))
-                                            <img src="{{ Storage::url($course->image_path) }}"
-                                                alt="{{ $course->title }}" class="w-full h-48 object-cover" />
+                                        @if ($course->has_image)
+                                            <img src="{{ $course->image_url }}" alt="{{ $course->title }}"
+                                                class="w-full h-48 object-cover" />
                                         @else
                                             <div class="w-full h-48 bg-base-200 flex items-center justify-center">
                                                 <div class="text-center">
@@ -78,6 +76,22 @@
                                                 class="btn btn-ghost btn-sm">Editar</a>
                                             <a href="{{ route('courses.wizard', $course) }}"
                                                 class="btn btn-outline btn-sm">Asistente</a>
+                                            @if ($course->status !== 'published')
+                                                <form method="POST" action="{{ route('courses.publish', $course) }}">
+                                                    @csrf
+                                                    @method('PUT')
+                                                    <button type="submit"
+                                                        class="btn btn-success btn-sm">Publicar</button>
+                                                </form>
+                                            @else
+                                                <form method="POST"
+                                                    action="{{ route('courses.unpublish', $course) }}">
+                                                    @csrf
+                                                    @method('PUT')
+                                                    <button type="submit"
+                                                        class="btn btn-warning btn-sm">Ocultar</button>
+                                                </form>
+                                            @endif
                                         </div>
                                     </div>
                                 </div>
