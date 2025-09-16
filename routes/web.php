@@ -79,6 +79,10 @@ Route::middleware('auth')->group(function () {
         Route::delete('/profile/avatar', [App\Http\Controllers\Student\DashboardController::class, 'deleteAvatar'])->name('profile.avatar.delete');
         Route::get('/my-courses', [App\Http\Controllers\Student\DashboardController::class, 'myCourses'])->name('my-courses');
         Route::get('/messages', [App\Http\Controllers\Student\DashboardController::class, 'messages'])->name('messages');
+        // Player de cursos comprados
+        Route::get('/courses/{course}/player', [App\Http\Controllers\Student\CoursePlayerController::class, 'index'])->name('courses.player');
+        Route::get('/courses/{course}/lesson/{lesson}', [App\Http\Controllers\Student\CoursePlayerController::class, 'showLesson'])->name('courses.lesson');
+        Route::post('/courses/{course}/lesson/{lesson}/progress', [App\Http\Controllers\Student\CoursePlayerController::class, 'saveProgress'])->name('courses.lesson.progress');
     });
 
     // Dashboard propio del profesor (opcional acceso directo)
