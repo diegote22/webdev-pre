@@ -85,6 +85,12 @@ Route::middleware('auth')->group(function () {
         Route::post('/courses/{course}/lesson/{lesson}/progress', [App\Http\Controllers\Student\CoursePlayerController::class, 'saveProgress'])->name('courses.lesson.progress');
     });
 
+    // Checkout de cursos (usuario autenticado)
+    Route::post('/checkout/course/{course}', [\App\Http\Controllers\CheckoutController::class, 'pay'])->name('checkout.pay');
+    Route::get('/checkout/course/{course}/success', [\App\Http\Controllers\CheckoutController::class, 'success'])->name('checkout.success');
+    Route::get('/checkout/course/{course}/pending', [\App\Http\Controllers\CheckoutController::class, 'pending'])->name('checkout.pending');
+    Route::get('/checkout/course/{course}/failure', [\App\Http\Controllers\CheckoutController::class, 'failure'])->name('checkout.failure');
+
     // Dashboard propio del profesor (opcional acceso directo)
     Route::middleware('role:Profesor,Docente')->get('/professor/dashboard', [\App\Http\Controllers\Professor\DashboardController::class, 'index'])->name('professor.dashboard');
 

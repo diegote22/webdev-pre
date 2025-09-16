@@ -15,15 +15,8 @@
                     </ul>
                 </div>
             </div>
-        </div>
-
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-
-                <!-- Contenido Principal -->
-                <div class="lg:col-span-2 space-y-6">
-
-                    <!-- Header del Curso -->
+                                        <h3 class="text-2xl font-bold">${{ number_format($course->price ?? 0, 2) }} <span class="text-sm font-normal">ARS</span></h3>
+                                        <p class="text-xs text-base-content/60 mt-1">Pago único</p>
                     <div class="bg-base-100 rounded-lg shadow-lg p-6">
                         <h1 class="text-3xl font-bold text-base-content mb-4">{{ $course->title }}</h1>
 
