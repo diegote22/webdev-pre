@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Section extends Model
 {
-    protected $fillable = ['course_id', 'name', 'position'];
+    protected $fillable = ['course_id', 'name', 'summary', 'position'];
 
     public function course()
     {

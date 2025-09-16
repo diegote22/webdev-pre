@@ -15,7 +15,8 @@ class Lesson extends Model
         'thumbnail_path',
         'is_published',
         'is_preview',
-        'position'
+        'position',
+        'duration',
     ];
 
     public function section()

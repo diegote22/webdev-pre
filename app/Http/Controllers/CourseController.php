@@ -303,7 +303,10 @@ class CourseController extends Controller
     {
         $this->authorizeOwner($course);
         if ($section->course_id !== $course->id) abort(404);
-        $data = $request->validate(['name' => ['required', 'string', 'max:255']]);
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'summary' => ['nullable', 'string', 'max:500'],
+        ]);
         $section->update($data);
         return back()->with(['status' => 'Sección actualizada', 'activeTab' => 'sections']);
     }
@@ -334,6 +337,7 @@ class CourseController extends Controller
             'attachment_online' => ['nullable', 'file', 'mimes:pdf', 'max:30720'], // 30MB
             'attachments_download' => ['nullable', 'array', 'max:3'],
             'attachments_download.*' => ['file', 'mimes:pdf', 'max:30720'],
+            'duration' => ['nullable', 'integer', 'min:0', 'max:21600'],
         ]);
 
         $video_url = null;
@@ -360,6 +364,7 @@ class CourseController extends Controller
             'is_published' => (bool)($data['is_published'] ?? false),
             'is_preview' => (bool)($data['is_preview'] ?? false) || (($data['access'] ?? 'public') === 'free'),
             'position' => $pos,
+            'duration' => $data['duration'] ?? null,
         ]);
 
         // Adjuntos PDF: 1 online máximo
@@ -418,6 +423,7 @@ class CourseController extends Controller
             'attachment_online' => ['nullable', 'file', 'mimes:pdf', 'max:30720'],
             'attachments_download' => ['nullable', 'array', 'max:3'],
             'attachments_download.*' => ['file', 'mimes:pdf', 'max:30720'],
+            'duration' => ['nullable', 'integer', 'min:0', 'max:21600'],
         ]);
 
         $update = [
@@ -426,6 +432,7 @@ class CourseController extends Controller
             'video_type' => $data['video_type'] ?? null,
             'is_published' => (bool)($data['is_published'] ?? false),
             'is_preview' => (bool)($data['is_preview'] ?? false) || (($data['access'] ?? 'public') === 'free'),
+            'duration' => $data['duration'] ?? $lesson->duration,
         ];
 
         if (($data['video_type'] ?? null) === 'youtube' && !empty($data['youtube_url'])) {
@@ -575,10 +582,44 @@ class CourseController extends Controller
             'requirements',
             'sections.lessons' => function ($query) {
                 $query->orderBy('position');
-            }
+            },
+            'reviews.user' => function ($q) {
+                $q->orderByDesc('course_reviews.created_at');
+            },
+            'students',
         ]);
 
-        return view('courses.public.show', compact('course'));
+        $userReview = null;
+        if (\Illuminate\Support\Facades\Auth::check()) {
+            $uid = \Illuminate\Support\Facades\Auth::id();
+            $userReview = $course->reviews->firstWhere('user_id', $uid);
+        }
+        return view('courses.public.show', compact('course', 'userReview'));
+    }
+
+    public function storeReview(Request $request, Course $course): RedirectResponse
+    {
+        $request->validate([
+            'rating' => ['required', 'integer', 'min:1', 'max:5'],
+            'comment' => ['nullable', 'string', 'max:2000'],
+        ]);
+
+        $user = $request->user();
+        if (!$user) {
+            return redirect()->route('login');
+        }
+
+        $isEnrolled = $course->students()->where('users.id', $user->id)->exists();
+        if (!$isEnrolled) {
+            return back()->with('error', 'Debes estar inscrito en el curso para dejar una reseña.');
+        }
+
+        \App\Models\CourseReview::updateOrCreate(
+            ['course_id' => $course->id, 'user_id' => $user->id],
+            ['rating' => (int) $request->rating, 'comment' => $request->comment]
+        );
+
+        return back()->with('status', '¡Gracias por tu reseña!');
     }
 
     // Búsqueda pública de cursos

@@ -16,20 +16,27 @@
 
         @forelse($course->sections()->with(['lessons.attachments'])->orderBy('position')->get() as $section)
             <div class="border rounded-lg p-4 bg-base-100 border-base-300 shadow-sm">
-                <div class="flex items-center gap-2 mb-3">
+                <div class="mb-4 space-y-3">
                     <form method="POST" action="{{ route('courses.sections.update', [$course, $section]) }}"
-                        class="flex-1 flex gap-2">
+                        class="space-y-3 section-update-form" data-section-id="{{ $section->id }}">
                         @csrf
                         @method('PUT')
-                        <input name="name"
-                            value="{{ old('name', isset($section->name) && trim($section->name) !== '' ? $section->name : 'Unidad ' . ($section->position ?? $loop->iteration) . ': ') }}"
-                            class="flex-1 input input-bordered bg-emerald-100 border-emerald-200 text-emerald-900 focus:border-emerald-300">
-                        <button class="btn" type="submit">Guardar sección</button>
-                    </form>
-                    <form method="POST" action="{{ route('courses.sections.destroy', [$course, $section]) }}">
-                        @csrf
-                        @method('DELETE')
-                        <button class="btn btn-error" type="submit">Eliminar sección</button>
+                        <div class="flex flex-wrap gap-2 items-center">
+                            <input name="name"
+                                value="{{ old('name', isset($section->name) && trim($section->name) !== '' ? $section->name : 'Unidad ' . ($section->position ?? $loop->iteration) . ': ') }}"
+                                class="flex-1 min-w-[260px] input input-bordered bg-emerald-100 border-emerald-200 text-emerald-900 focus:border-emerald-300">
+                            <button class="btn" type="submit">Guardar</button>
+                            <button class="btn btn-error" type="button"
+                                onclick="deleteSection('{{ route('courses.sections.destroy', [$course, $section]) }}')">Eliminar</button>
+                            <span class="text-xs text-base-content/60 section-autosave-status">&nbsp;</span>
+                        </div>
+                        <div>
+                            <input name="summary" value="{{ $section->summary }}" maxlength="500"
+                                placeholder="Resumen de la unidad (opcional, máx 500)"
+                                class="input input-bordered w-full" />
+                            <p class="text-xs text-base-content/60 mt-1">Este resumen aparece antes de las lecciones de
+                                la unidad.</p>
+                        </div>
                     </form>
                 </div>
 
@@ -46,6 +53,9 @@
                                     <input name="title" value="{{ $lesson->title }}"
                                         class="flex-1 input input-bordered bg-emerald-50 border-emerald-200 text-emerald-900 focus:border-emerald-300"
                                         placeholder="Título de la lección">
+                                    <input type="number" name="duration" value="{{ $lesson->duration }}"
+                                        min="0" step="1" placeholder="min"
+                                        class="w-24 input input-bordered" title="Duración (min)">
                                     <label class="inline-flex items-center gap-2 text-sm"><input type="checkbox"
                                             class="toggle" name="is_preview" value="1"
                                             @checked($lesson->is_preview)>
@@ -107,50 +117,52 @@
                                 </div>
 
                                 <!-- Materiales de la lección -->
+                            </form>
+                            <!-- Bloque independiente de material de la lección (sin formularios anidados) -->
+                            <div class="mt-4 border-t pt-4 space-y-3">
                                 <div class="text-sm font-medium text-base-content">Material de la lección (PDF/Imagen)
                                 </div>
-                                <div class="space-y-2">
-                                    <form method="POST"
-                                        action="{{ route('courses.lessons.attachments.store', [$course, $section, $lesson]) }}"
-                                        enctype="multipart/form-data" class="flex items-center gap-2">
-                                        @csrf
-                                        <input type="file" name="attachments[]" accept="application/pdf,image/*"
-                                            multiple class="file-input file-input-bordered">
-                                        <button class="btn" type="submit">Subir</button>
-                                    </form>
-                                    <ul class="text-sm list-disc pl-5 space-y-2">
-                                        @forelse(($lesson->attachments ?? collect()) as $att)
-                                            <li class="flex items-center justify-between gap-3">
-                                                <div class="flex items-center gap-2 min-w-0">
-                                                    @php($ext = strtolower(pathinfo($att->name, PATHINFO_EXTENSION)))
-                                                    @if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp']))
-                                                        <img src="{{ Storage::url($att->path) }}"
-                                                            alt="{{ $att->name }}"
-                                                            class="w-10 h-10 object-cover rounded border">
-                                                    @elseif($ext === 'pdf')
-                                                        <span
-                                                            class="inline-flex items-center justify-center w-10 h-10 bg-red-50 text-red-600 border rounded text-xs font-semibold">PDF</span>
-                                                    @else
-                                                        <span
-                                                            class="inline-flex items-center justify-center w-10 h-10 bg-base-200 text-base-content border border-base-300 rounded text-xs font-semibold">FILE</span>
-                                                    @endif
-                                                    <a href="{{ Storage::url($att->path) }}" target="_blank"
-                                                        class="text-indigo-700 underline truncate">{{ $att->name }}</a>
-                                                </div>
-                                                <form method="POST"
-                                                    action="{{ route('courses.lessons.attachments.destroy', [$course, $section, $lesson, $att]) }}"
-                                                    onsubmit="return confirm('¿Eliminar material?')">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button class="text-red-600 text-xs">Eliminar</button>
-                                                </form>
-                                            </li>
-                                        @empty
-                                            <li class="text-base-content/60">Sin materiales aún.</li>
-                                        @endforelse
-                                    </ul>
-                                </div>
-                            </form>
+                                <form method="POST"
+                                    action="{{ route('courses.lessons.attachments.store', [$course, $section, $lesson]) }}"
+                                    enctype="multipart/form-data" class="flex flex-wrap items-center gap-2">
+                                    @csrf
+                                    <input type="file" name="attachments[]" accept="application/pdf,image/*"
+                                        multiple class="file-input file-input-bordered" />
+                                    <button class="btn" type="submit">Subir</button>
+                                    <span class="text-xs text-base-content/50">PDF / Imágenes (hasta 50MB c/u)</span>
+                                </form>
+                                <ul class="text-sm list-disc pl-5 space-y-2">
+                                    @forelse(($lesson->attachments ?? collect()) as $att)
+                                        <li class="flex items-center justify-between gap-3">
+                                            <div class="flex items-center gap-2 min-w-0">
+                                                @php($ext = strtolower(pathinfo($att->name, PATHINFO_EXTENSION)))
+                                                @if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp']))
+                                                    <img src="{{ Storage::url($att->path) }}"
+                                                        alt="{{ $att->name }}"
+                                                        class="w-10 h-10 object-cover rounded border">
+                                                @elseif($ext === 'pdf')
+                                                    <span
+                                                        class="inline-flex items-center justify-center w-10 h-10 bg-red-50 text-red-600 border rounded text-xs font-semibold">PDF</span>
+                                                @else
+                                                    <span
+                                                        class="inline-flex items-center justify-center w-10 h-10 bg-base-200 text-base-content border border-base-300 rounded text-xs font-semibold">FILE</span>
+                                                @endif
+                                                <a href="{{ Storage::url($att->path) }}" target="_blank"
+                                                    class="text-indigo-700 underline truncate">{{ $att->name }}</a>
+                                            </div>
+                                            <form method="POST"
+                                                action="{{ route('courses.lessons.attachments.destroy', [$course, $section, $lesson, $att]) }}"
+                                                onsubmit="return confirm('¿Eliminar material?')" class="shrink-0">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button class="text-red-600 text-xs">Eliminar</button>
+                                            </form>
+                                        </li>
+                                    @empty
+                                        <li class="text-base-content/60">Sin materiales aún.</li>
+                                    @endforelse
+                                </ul>
+                            </div>
                             <form method="POST"
                                 action="{{ route('courses.lessons.destroy', [$course, $section, $lesson]) }}"
                                 class="mt-2">
@@ -244,6 +256,14 @@
                                                 placeholder="Resumen del contenido de la lección"></textarea>
                                         </div>
 
+
+                                        <div class="form-control">
+                                            <label class="label"><span class="label-text font-semibold">Duración
+                                                    (minutos)</span></label>
+                                            <input type="number" name="duration" min="0" step="1"
+                                                class="input input-bordered h-12" placeholder="Ej: 12">
+                                        </div>
+
                                         <!-- Acceso -->
                                         <div class="form-control">
                                             <label class="label"><span class="label-text font-semibold">Configuración
@@ -315,6 +335,89 @@
         @endforelse
     </div>
     <script>
+        // ---- Auto-guardado de nombre y resumen de unidades ----
+        document.querySelectorAll('.section-update-form').forEach(form => {
+            const statusEl = form.querySelector('.section-autosave-status');
+            let dirty = false;
+            let timer = null;
+            const debounce = (fn, wait = 800) => {
+                return (...args) => {
+                    clearTimeout(timer);
+                    timer = setTimeout(() => fn(...args), wait);
+                };
+            };
+            const save = async () => {
+                if (!dirty) return;
+                dirty = false;
+                if (statusEl) statusEl.textContent = 'Guardando…';
+                const fd = new FormData(form);
+                fd.append('_method', 'PUT');
+                try {
+                    const res = await fetch(form.action, {
+                        method: 'POST',
+                        body: fd,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    });
+                    if (statusEl) statusEl.textContent = res.ok ? 'Guardado' : 'Error';
+                } catch (e) {
+                    if (statusEl) statusEl.textContent = 'Error';
+                }
+            };
+            const schedule = debounce(save, 900);
+            form.querySelectorAll('input[name="name"], input[name="summary"]').forEach(inp => {
+                inp.addEventListener('input', () => {
+                    dirty = true;
+                    if (statusEl) statusEl.textContent = 'Cambios sin guardar';
+                    schedule();
+                });
+            });
+        });
+
+        async function deleteSection(url) {
+            if (!confirm('¿Eliminar la unidad completa?')) return;
+            const fd = new FormData();
+            fd.append('_token', '{{ csrf_token() }}');
+            fd.append('_method', 'DELETE');
+            try {
+                await fetch(url, {
+                    method: 'POST',
+                    body: fd,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+            } catch (e) {}
+            window.location.reload();
+        }
+
+        // Antes de ejecutar cualquier otra acción (p.ej. eliminar PDF) intenta guardar formularios con cambios pendientes
+        document.addEventListener('submit', function(e) {
+            const target = e.target;
+            // Si es un formulario de attachments / lecciones, disparamos guardado previo de secciones sucias.
+            if (target.action.includes('lessons.attachments.destroy') || target.action.includes('lessons.update') ||
+                target.action.includes('lessons.store') || target.action.includes('lessons.destroy')) {
+                const dirtyForms = Array.from(document.querySelectorAll('.section-update-form'));
+                dirtyForms.forEach(f => {
+                    const statusEl = f.querySelector('.section-autosave-status');
+                    if (statusEl && statusEl.textContent === 'Cambios sin guardar') {
+                        const fd = new FormData(f);
+                        fd.append('_method', 'PUT');
+                        fetch(f.action, {
+                            method: 'POST',
+                            body: fd,
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest'
+                            }
+                        }).then(r => {
+                            if (statusEl) statusEl.textContent = r.ok ? 'Guardado' : 'Error';
+                        });
+                    }
+                });
+            }
+        }, true);
+
         async function submitFormSequential(form) {
             const fd = new FormData(form)
             // Evitar enviar formularios de adjuntos sin archivos

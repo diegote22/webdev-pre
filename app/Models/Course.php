@@ -9,6 +9,7 @@ use App\Models\Category;
 use App\Models\SubCategory;
 use App\Models\CourseGoal;
 use App\Models\CourseRequirement;
+use App\Models\CourseReview;
 
 class Course extends Model
 {
@@ -57,6 +58,11 @@ class Course extends Model
         return $this->hasMany(Section::class)->orderBy('position');
     }
 
+    public function reviews()
+    {
+        return $this->hasMany(CourseReview::class);
+    }
+
     // Estados posibles: pending, under_review, published, rejected, unpublished
     public function scopePublished($query)
     {
@@ -99,5 +105,16 @@ class Course extends Model
     public function getHasImageAttribute(): bool
     {
         return $this->image_path ? Storage::disk('public')->exists($this->image_path) : false;
+    }
+
+    public function getAverageRatingAttribute(): float
+    {
+        $avg = (float) ($this->reviews()->avg('rating') ?? 0);
+        return round($avg, 1);
+    }
+
+    public function getReviewsCountAttribute(): int
+    {
+        return (int) ($this->reviews()->count());
     }
 }

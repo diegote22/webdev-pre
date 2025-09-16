@@ -148,6 +148,9 @@ Route::get('/buscar', [CourseController::class, 'search'])->name('courses.search
 // Ruta pública para ver el detalle de un curso
 Route::get('/curso/{course}', [CourseController::class, 'show'])->name('courses.show');
 
+// Reseñas de cursos (requiere login, además verificamos inscripción)
+Route::post('/curso/{course}/review', [CourseController::class, 'storeReview'])->middleware(['auth'])->name('courses.review');
+
 // Nota: El grupo de rutas de admin con DashboardController fue removido temporalmente
 // porque el controlador no existe en este repositorio. Puedes restaurarlo cuando
 // agregues App\Http\Controllers\Admin\DashboardController y sus vistas.
