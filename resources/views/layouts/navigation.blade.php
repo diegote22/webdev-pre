@@ -28,7 +28,7 @@
     <div class="flex-1">
         <a href="{{ route('home') }}" class="btn btn-ghost text-xl font-bold text-primary gap-2 items-center">
             <img src="{{ asset('img/webdev.png') }}" alt="WebDev-Pre" class="h-8 w-auto" loading="lazy" />
-            <span class="hidden sm:inline">WebDev-Pre</span>
+            <span class="hidden sm:inline logo-font">WebDev-Pre</span>
         </a>
     </div>
 

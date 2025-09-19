@@ -6,6 +6,7 @@ use App\Http\Controllers\Instructor\CourseController as InstructorCourseControll
 use App\Http\Controllers\Admin\AdminController as AdminAreaController;
 use Illuminate\Support\Facades\Route;
 use App\Models\Course as CourseModel;
+use App\Http\Controllers\Webhook\MercadoPagoWebhookController;
 
 Route::get('/', function () {
     $secundariaCourses = CourseModel::published()->whereHas('category', function ($query) {
@@ -152,11 +153,21 @@ Route::get('/cursos/secundaria', [CourseController::class, 'secundaria'])->name(
 Route::get('/cursos/pre-universitario', [CourseController::class, 'preUniversitario'])->name('courses.pre-universitario');
 Route::get('/cursos/universitario', [CourseController::class, 'universitario'])->name('courses.universitario');
 
+// Páginas estáticas
+Route::get('/nosotros', function () {
+    return view('pages.nosotros');
+})->name('pages.nosotros');
+
+Route::get('/preguntas', function () {
+    return view('pages.preguntas');
+})->name('pages.preguntas');
+
 // Búsqueda pública de cursos
 Route::get('/buscar', [CourseController::class, 'search'])->name('courses.search');
 
 // Ruta pública para ver el detalle de un curso
 Route::get('/curso/{course}', [CourseController::class, 'show'])->name('courses.show');
+Route::post('/webhooks/mercadopago', [MercadoPagoWebhookController::class, 'handle'])->name('webhooks.mercadopago');
 
 // Reseñas de cursos (requiere login, además verificamos inscripción)
 Route::post('/curso/{course}/review', [CourseController::class, 'storeReview'])->middleware(['auth'])->name('courses.review');
@@ -172,6 +183,10 @@ Route::middleware(['auth', 'verified', 'role:Administrador'])->prefix('admin')->
     Route::get('/dashboard', [AdminAreaController::class, 'dashboard'])->name('dashboard');
     Route::get('/branding', [AdminAreaController::class, 'branding'])->name('branding');
     Route::post('/branding', [AdminAreaController::class, 'saveBranding'])->name('branding.save');
+    Route::get('/payments', [AdminAreaController::class, 'payments'])->name('payments');
+    Route::get('/payments/export', [AdminAreaController::class, 'paymentsExport'])->name('payments.export');
+    Route::get('/payments/{payment}', [AdminAreaController::class, 'paymentShow'])->name('payments.show');
+    Route::post('/payments/{payment}/reconcile', [AdminAreaController::class, 'paymentReconcile'])->name('payments.reconcile');
     // Foto de administrador
     Route::post('/avatar', [AdminAreaController::class, 'uploadAvatar'])->name('avatar.upload');
     Route::delete('/avatar', [AdminAreaController::class, 'deleteAvatar'])->name('avatar.delete');

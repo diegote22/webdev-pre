@@ -11,14 +11,43 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Slabo+27px&family=PT+Sans:wght@400;700&family=Roboto:wght@300;400;500;700&display=swap"
+        rel="stylesheet">
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <style>
+        /* Configuración de tipografías */
         body {
-            font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, 'Helvetica Neue', Arial, 'Noto Sans', 'Apple Color Emoji', 'Segoe UI Emoji';
+            font-family: 'Roboto', sans-serif;
+        }
+
+        /* Logo/Marca principal con Slabo 27px */
+        .logo-font {
+            font-family: 'Slabo 27px', serif;
+        }
+
+        /* Títulos y subtítulos con PT Sans */
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6,
+        .heading-font {
+            font-family: 'PT Sans', sans-serif;
+        }
+
+        /* Textos generales con Roboto */
+        p,
+        span,
+        div,
+        a,
+        button,
+        .text-font {
+            font-family: 'Roboto', sans-serif;
         }
 
         .glass {
@@ -32,7 +61,7 @@
     <!-- Header -->
     <header class="sticky top-0 z-50 glass border-b border-gray-200">
         <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <a href="/" class="text-xl font-extrabold text-purple-700">WebDev-Pre</a>
+            <a href="/" class="text-xl font-extrabold text-purple-700 logo-font">WebDev-Pre</a>
             <div class="hidden md:flex items-center gap-6">
                 <a href="#" class="text-gray-700 hover:text-purple-700">Salud</a>
                 <a href="#" class="text-gray-700 hover:text-purple-700">Cursos</a>

@@ -1,0 +1,17 @@
+# pnpm configuration for this workspace
+# See: https://pnpm.io/settings
+
+# Define workspace root (even if single-package) and allow future package globs if needed.
+packages:
+  - '.'
+
+# Security: delay installs of newly published versions by 1 day (1440 minutes)
+minimumReleaseAge: 1440
+
+# Since pnpm v10, dependency lifecycle scripts are blocked by default unless explicitly allowed.
+# Allow only the packages that need to run install/postinstall to fetch platform binaries, etc.
+# See: https://pnpm.io/settings#onlybuiltdependencies
+onlyBuiltDependencies:
+  - esbuild
+  - '@tailwindcss/oxide'
+  - core-js

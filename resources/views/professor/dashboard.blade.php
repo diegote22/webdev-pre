@@ -5,8 +5,8 @@
         <div class="bg-base-100 border-b border-base-300">
             <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex items-center justify-between">
                 <div>
-                    <h1 class="text-3xl font-bold">Mi Panel</h1>
-                    <p class="text-base-content/70 mt-1">Bienvenido, {{ $user->name }}</p>
+                    <h1 class="text-3xl font-bold heading-font">Mi Panel</h1>
+                    <p class="text-base-content/70 mt-1 text-font">Bienvenido, {{ $user->name }}</p>
                 </div>
                 <div class="flex items-center gap-3">
                     <a href="{{ route('courses.create') }}" class="btn btn-primary">+ Nuevo curso</a>

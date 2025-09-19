@@ -8,8 +8,47 @@
 
     <title>{{ config('app.name', 'Laravel') }}</title>
 
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Slabo+27px&family=PT+Sans:wght@400;700&family=Roboto:wght@300;400;500;700&display=swap"
+        rel="stylesheet">
+
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    <style>
+        /* Configuración de tipografías */
+        body {
+            font-family: 'Roboto', sans-serif;
+        }
+
+        /* Logo/Marca principal con Slabo 27px */
+        .logo-font {
+            font-family: 'Slabo 27px', serif;
+        }
+
+        /* Títulos y subtítulos con PT Sans */
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6,
+        .heading-font {
+            font-family: 'PT Sans', sans-serif;
+        }
+
+        /* Textos generales con Roboto */
+        p,
+        span,
+        div,
+        a,
+        button,
+        .text-font {
+            font-family: 'Roboto', sans-serif;
+        }
+    </style>
 </head>
 
 <body class="font-sans text-gray-900 antialiased">

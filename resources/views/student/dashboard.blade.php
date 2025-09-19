@@ -22,8 +22,9 @@
                             @endif
                         </div>
                     </div>
-                    <h1 class="text-4xl font-bold mb-4">¡Bienvenido de vuelta, {{ $user->name }}!</h1>
-                    <p class="text-lg opacity-90 mb-6">Continúa tu viaje de aprendizaje. Tienes {{ $inProgressCourses }}
+                    <h1 class="text-4xl font-bold mb-4 heading-font">¡Bienvenido de vuelta, {{ $user->name }}!</h1>
+                    <p class="text-lg opacity-90 mb-6 text-font">Continúa tu viaje de aprendizaje. Tienes
+                        {{ $inProgressCourses }}
                         cursos en progreso.</p>
                     <div class="flex flex-wrap justify-center gap-4">
                         <a href="{{ route('student.my-courses') }}" class="btn btn-accent btn-lg">

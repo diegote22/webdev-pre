@@ -7,17 +7,56 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
+## Acerca del proyecto y gestor de paquetes
+
+Este proyecto usa pnpm como gestor de paquetes (pinneado vía `packageManager: pnpm@10.17.0`).
+
+-   Instalación: `corepack pnpm install`
+-   Desarrollo: `corepack pnpm run dev`
+-   Build de producción: `corepack pnpm run build`
+
+Política de seguridad de dependencias:
+
+-   Se configuró `minimumReleaseAge: 1440` en `pnpm-workspace.yaml`, lo que retrasa la instalación de versiones publicadas en las últimas 24 horas para reducir riesgo de supply-chain.
+-   Se aprobaron explícitamente scripts de compilación solo para dependencias necesarias mediante `onlyBuiltDependencies`.
+
+Si prefieres usar los binarios globales, instala pnpm con Corepack. En Windows, puedes ejecutar `corepack pnpm -v` sin habilitar shims globales.
+
+---
+
+## Layout público y héroe full-width
+
+El layout principal (`resources/views/layouts/app.blade.php`) ahora admite dos flags opcionales cuando usas el componente `x-app-layout`:
+
+-   `:public-nav="true"` para mostrar el navbar público (igual al de la portada) en lugar del navbar autenticado.
+-   `:full-bleed="true"` para que el contenido principal no use el contenedor centrado y permita secciones a ancho completo (útil para héroes full-width).
+
+Ejemplo de uso en una vista Blade:
+
+```blade
+<x-app-layout :public-nav="true" :full-bleed="true">
+	{{-- tu contenido aquí --}}
+	@section('content')
+		{{-- ... --}}
+	@endsection
+</x-app-layout>
+```
+
+La página de categoría pública de cursos (por ejemplo, Secundaria) ya usa estos flags para tener un héroe a ancho completo y el navbar de la portada.
+
+---
+
 ## About Laravel
 
 Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+-   [Simple, fast routing engine](https://laravel.com/docs/routing).
+-   [Powerful dependency injection container](https://laravel.com/docs/container).
+-   Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
+-   Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
+-   Database agnostic [schema migrations](https://laravel.com/docs/migrations).
+-   [Robust background job processing](https://laravel.com/docs/queues).
+-   [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
 
 Laravel is accessible, powerful, and provides tools required for large, robust applications.
 
@@ -35,14 +74,14 @@ We would like to extend our thanks to the following sponsors for funding Laravel
 
 ### Premium Partners
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+-   **[Vehikl](https://vehikl.com)**
+-   **[Tighten Co.](https://tighten.co)**
+-   **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
+-   **[64 Robots](https://64robots.com)**
+-   **[Curotec](https://www.curotec.com/services/technologies/laravel)**
+-   **[DevSquad](https://devsquad.com/hire-laravel-developers)**
+-   **[Redberry](https://redberry.international/laravel-development)**
+-   **[Active Logic](https://activelogic.com)**
 
 ## Contributing
 

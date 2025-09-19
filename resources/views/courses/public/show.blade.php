@@ -313,38 +313,45 @@
                             @php($enrolled = auth()->check() ? $course->students->contains(auth()->id()) : false)
                             <div class="text-center mb-6 space-y-2">
                                 <div class="text-3xl font-bold text-primary">
-                                    ${{ number_format($course->price ?? 0, 2) }} <span class="text-sm font-normal text-base-content/60">ARS</span>
+                                    ${{ number_format($course->price ?? 0, 2) }} <span
+                                        class="text-sm font-normal text-base-content/60">ARS</span>
                                 </div>
-                                @if(($course->price ?? 0) <= 0)
+                                @if (($course->price ?? 0) <= 0)
                                     <div class="text-xs text-success">Curso gratuito</div>
                                 @endif
-                                @if(session('status'))
+                                @if (session('status'))
                                     <div class="text-xs text-success">{{ session('status') }}</div>
                                 @endif
-                                @if(session('error'))
+                                @if (session('error'))
                                     <div class="text-xs text-error">{{ session('error') }}</div>
                                 @endif
                             </div>
 
                             <div class="space-y-3 mb-6">
                                 @auth
-                                    @if($enrolled)
-                                        <a href="{{ route('student.courses.player', $course) }}" class="btn btn-primary w-full">Ir al curso</a>
+                                    @if ($enrolled)
+                                        <a href="{{ route('student.courses.player', $course) }}"
+                                            class="btn btn-primary w-full">Ir al curso</a>
                                     @else
-                                        @if(($course->price ?? 0) > 0)
-                                            <form method="POST" action="{{ route('checkout.pay', $course) }}" class="space-y-2">
+                                        @if (($course->price ?? 0) > 0)
+                                            <form method="POST" action="{{ route('checkout.pay', $course) }}"
+                                                class="space-y-2">
                                                 @csrf
-                                                <button type="submit" class="btn btn-primary w-full">Comprar ahora</button>
+                                                <button type="submit" class="btn btn-primary w-full">Comprar
+                                                    ahora</button>
                                             </form>
                                         @else
-                                            <form method="POST" action="{{ route('checkout.pay', $course) }}" class="space-y-2">
+                                            <form method="POST" action="{{ route('checkout.pay', $course) }}"
+                                                class="space-y-2">
                                                 @csrf
-                                                <button type="submit" class="btn btn-success w-full">Inscribirme Gratis</button>
+                                                <button type="submit" class="btn btn-success w-full">Inscribirme
+                                                    Gratis</button>
                                             </form>
                                         @endif
                                     @endif
                                 @else
-                                    <a href="{{ route('login') }}" class="btn btn-primary w-full">Inicia sesión para comprar</a>
+                                    <a href="{{ route('login') }}" class="btn btn-primary w-full">Inicia sesión para
+                                        comprar</a>
                                 @endauth
                             </div>
 

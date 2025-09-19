@@ -9,6 +9,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use App\Models\Payment;
+use MercadoPago\Client\Payment\PaymentClient;
+use Illuminate\Support\Facades\DB;
 
 class AdminController extends Controller
 {
@@ -311,5 +314,118 @@ class AdminController extends Controller
         $item->active = ! $item->active;
         $item->save();
         return back()->with('success', 'Estado actualizado');
+    }
+
+    // ---- Pagos (Mercado Pago) ----
+    public function payments(Request $request)
+    {
+        $status = $request->get('status');
+        $q = trim((string)$request->get('q', ''));
+        $payments = Payment::with(['user', 'course'])
+            ->when($status, fn($query) => $query->where('status', $status))
+            ->when($q !== '', function ($query) use ($q) {
+                $query->where(function ($sub) use ($q) {
+                    $sub->where('external_reference', 'like', "%$q%")
+                        ->orWhereHas('user', fn($uq) => $uq->where('email', 'like', "%$q%"))
+                        ->orWhereHas('course', fn($cq) => $cq->where('title', 'like', "%$q%"));
+                });
+            })
+            ->orderByDesc('id')
+            ->paginate(20)
+            ->withQueryString();
+        $statusCounts = Payment::selectRaw('status, COUNT(*) as c')->groupBy('status')->pluck('c', 'status');
+
+        // Métricas simples
+        $totalApproved = Payment::approved()->sum('transaction_amount');
+        $monthApproved = Payment::approved()->whereMonth('created_at', now()->month)->whereYear('created_at', now()->year)->sum('transaction_amount');
+        $last30 = Payment::approved()->where('created_at', '>=', now()->subDays(30))->sum('transaction_amount');
+        $dailyAvg30 = $last30 / max(1, min(30, now()->diffInDays(now()->subDays(30)) ?: 30));
+
+        return view('admin.payments.index', compact('payments', 'status', 'q', 'statusCounts', 'totalApproved', 'monthApproved', 'last30', 'dailyAvg30'));
+    }
+
+    public function paymentShow(Payment $payment)
+    {
+        return view('admin.payments.show', [
+            'payment' => $payment->load(['user', 'course'])
+        ]);
+    }
+
+    public function paymentReconcile(Payment $payment, PaymentClient $client)
+    {
+        if (!$payment->mp_payment_id) {
+            return back()->with('error', 'No hay mp_payment_id para reconciliar');
+        }
+        try {
+            $remote = $client->get((int)$payment->mp_payment_id);
+            $payment->fill([
+                'status' => $remote->status,
+                'status_detail' => $remote->status_detail,
+                'transaction_amount' => $remote->transaction_amount,
+                'net_amount' => $remote->net_amount,
+                'currency_id' => $remote->currency_id,
+                'payment_method_id' => $remote->payment_method_id,
+                'payment_type_id' => $remote->payment_type_id,
+                'payer_email' => $remote->payer['email'] ?? null,
+                'payer_id' => $remote->payer['id'] ?? null,
+            ])->save();
+            if ($payment->status === 'approved' && !$payment->enrolled_at && $payment->course_id && $payment->user_id) {
+                DB::table('enrollments')->insertOrIgnore([
+                    'user_id' => $payment->user_id,
+                    'course_id' => $payment->course_id,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+                $payment->enrolled_at = now();
+                $payment->save();
+            }
+            return back()->with('success', 'Reconciliado.');
+        } catch (\Throwable $e) {
+            return back()->with('error', 'Error: ' . $e->getMessage());
+        }
+    }
+
+    public function paymentsExport(Request $request)
+    {
+        $status = $request->get('status');
+        $q = trim((string)$request->get('q', ''));
+        $rows = Payment::with(['user', 'course'])
+            ->when($status, fn($query) => $query->where('status', $status))
+            ->when($q !== '', function ($query) use ($q) {
+                $query->where(function ($sub) use ($q) {
+                    $sub->where('external_reference', 'like', "%$q%")
+                        ->orWhereHas('user', fn($uq) => $uq->where('email', 'like', "%$q%"))
+                        ->orWhereHas('course', fn($cq) => $cq->where('title', 'like', "%$q%"));
+                });
+            })
+            ->orderByDesc('id')
+            ->limit(5000) // límite razonable
+            ->get();
+
+        $headers = [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="payments_export_' . now()->format('Ymd_His') . '.csv"',
+        ];
+        $callback = function () use ($rows) {
+            $out = fopen('php://output', 'w');
+            fputcsv($out, ['id', 'created_at', 'course', 'user_email', 'amount', 'currency', 'status', 'method', 'type', 'enrolled_at', 'external_reference']);
+            foreach ($rows as $r) {
+                fputcsv($out, [
+                    $r->id,
+                    $r->created_at,
+                    optional($r->course)->title,
+                    optional($r->user)->email,
+                    $r->transaction_amount,
+                    $r->currency_id,
+                    $r->status,
+                    $r->payment_method_id,
+                    $r->payment_type_id,
+                    $r->enrolled_at,
+                    $r->external_reference,
+                ]);
+            }
+            fclose($out);
+        };
+        return response()->stream($callback, 200, $headers);
     }
 }

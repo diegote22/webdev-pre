@@ -4,7 +4,7 @@
 
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-base-content leading-tight">
+        <h2 class="font-semibold text-xl text-base-content leading-tight heading-font">
             {{ __('Mis Cursos') }}
         </h2>
     </x-slot>

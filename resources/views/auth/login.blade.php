@@ -6,7 +6,47 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ config('app.name', 'Laravel') }} - Iniciar Sesión</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Slabo+27px&family=PT+Sans:wght@400;700&family=Roboto:wght@300;400;500;700&display=swap"
+        rel="stylesheet">
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    <style>
+        /* Configuración de tipografías */
+        body {
+            font-family: 'Roboto', sans-serif;
+        }
+
+        /* Logo/Marca principal con Slabo 27px */
+        .logo-font {
+            font-family: 'Slabo 27px', serif;
+        }
+
+        /* Títulos y subtítulos con PT Sans */
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6,
+        .heading-font {
+            font-family: 'PT Sans', sans-serif;
+        }
+
+        /* Textos generales con Roboto */
+        p,
+        span,
+        div,
+        a,
+        button,
+        .text-font {
+            font-family: 'Roboto', sans-serif;
+        }
+    </style>
 </head>
 
 <body class="min-h-screen bg-gray-50">
@@ -21,8 +61,9 @@
             <!-- Content over image -->
             <div class="relative z-10 flex flex-col justify-center items-start p-12 text-white max-w-lg">
                 <div class="mb-8">
-                    <h1 class="text-4xl font-bold mb-4 leading-tight">Transforma tu futuro con educación de calidad</h1>
-                    <p class="text-xl text-white/90 leading-relaxed">Accede a miles de cursos y desarrolla las
+                    <h1 class="text-4xl font-bold mb-4 leading-tight heading-font">Transforma tu futuro con educación de
+                        calidad</h1>
+                    <p class="text-xl text-white/90 leading-relaxed text-font">Accede a miles de cursos y desarrolla las
                         habilidades que necesitas para destacar en tu carrera profesional.</p>
                 </div>
 
@@ -77,8 +118,9 @@
                             </div>
                         </a>
                     </div>
-                    <h2 class="text-3xl font-bold text-gray-900 mb-2">Bienvenido a WebDev-Pre</h2>
-                    <p class="text-gray-600">Ingresa tus credenciales para continuar</p>
+                    <h2 class="text-3xl font-bold text-gray-900 mb-2 heading-font">Bienvenido a <span
+                            class="logo-font">WebDev-Pre</span></h2>
+                    <p class="text-gray-600 text-font">Ingresa tus credenciales para continuar</p>
                 </div>
 
                 <!-- Session Status -->
